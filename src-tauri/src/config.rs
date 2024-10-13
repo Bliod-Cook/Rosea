@@ -1,6 +1,5 @@
 use toml::Value;
 
-
 pub fn get_config(config: String) -> String {
     // TODO
     let appdata = std::env::var("APPData").unwrap() + "/rosea";
