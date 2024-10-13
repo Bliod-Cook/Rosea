@@ -1,0 +1,9 @@
+.middle {
+    text-align: center;
+}
+
+.clockFont {
+    font-size: 30px;
+    line-height: 60px;
+    user-select: none;
+}
