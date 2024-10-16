@@ -3,7 +3,7 @@ export default function WinButton({children, width, height, onClick}: {children?
     return (
         <button style={{
             backgroundColor: "#f0f0f0",
-            border: "1px solid #ccc",
+            border: "1px solid #888888",
             padding: `${height ? height : 10}px ${width ? width : 20}px`,
             fontSize: "10px",
             cursor: "pointer",

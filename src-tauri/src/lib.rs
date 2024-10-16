@@ -3,8 +3,7 @@ mod config;
 use rand::Rng;
 use tauri::{
     menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
-    Manager,
+    tray::TrayIconBuilder
 };
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

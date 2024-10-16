@@ -4,6 +4,7 @@ import {invoke} from "@tauri-apps/api/core";
 import { message } from "@tauri-apps/plugin-dialog";
 import {useEffect, useState} from "react";
 import { Window } from "@tauri-apps/api/window";
+import {getConfig} from "@/app/scripts/config";
 
 export default function Settings() {
 
@@ -50,10 +51,10 @@ export default function Settings() {
 
 async function close_page() {
     const window = await Window.getByLabel("SettingsPage")
-    window?.destroy()
+    await window?.hide()
 }
 
 async function get_config(config: string, default_value: number): Promise<number> {
-    const value: string = await invoke("get_config", {config: config});
-    return value === "null" ? default_value : parseInt(value.slice(1,-1))
+    const value: string = await getConfig(config);
+    return value === "null" ? default_value : parseInt(value)
 }

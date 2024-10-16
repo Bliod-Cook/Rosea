@@ -6,36 +6,38 @@ import {invoke} from "@tauri-apps/api/core";
 import {Window} from "@tauri-apps/api/window";
 import WinButton from "@/app/components/winButton";
 import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
+import {getConfig} from "@/app/scripts/config";
 
 export default function Random() {
-    function openSettingsPage() {
-        new WebviewWindow('SettingsPage', {
-            url: '/settings',
-            decorations: true,
-            transparent: false,
-            shadow: true,
-            alwaysOnTop: true,
-            resizable: false,
-            width: 360,
-            height: 240,
-            focus: true,
-            skipTaskbar: true,
-            dragDropEnabled: true,
-            visible: true,
-            x: 500,
-            y: 500,
-            title: "设置",
-        })
+    const [settingsPage] = useState(new WebviewWindow('SettingsPage', {
+        url: '/settings',
+        decorations: true,
+        transparent: false,
+        shadow: true,
+        alwaysOnTop: true,
+        resizable: false,
+        width: 360,
+        height: 240,
+        focus: true,
+        skipTaskbar: true,
+        dragDropEnabled: true,
+        visible: false,
+        x: 500,
+        y: 500,
+        title: "设置",
+    }))
+
+    async function openSettingsPage() {
+        await settingsPage.show();
     }
 
     const [randomedNumber, setRandomedNumber] = useState(0)
     async function getRandomNumber() {
-        const min_config: string = await invoke("get_config", {config: "MIN"});
-        console.log(min_config)
-        const max_config: string = await invoke("get_config", {config: "MAX"});
-        const min: number = min_config === "null" ? 1 : parseInt(min_config.slice(1,-1));
-        console.log(min)
-        const max: number = max_config === "null" ? 48 : parseInt(max_config.slice(1,-1));
+        // const min_config: string = await invoke("get_config", {config: "MIN"});
+        const min_config: string = await getConfig("MIN")
+        const max_config: string = await getConfig("MAX");
+        const min: number = min_config === "null" ? 1 : parseInt(min_config);
+        const max: number = max_config === "null" ? 48 : parseInt(max_config);
         const number = await randomNumber({minimum: min, maximum: max})
         setRandomedNumber(number)
     }
@@ -55,7 +57,6 @@ export default function Random() {
 }
 
 async function randomNumber(range: { minimum: number, maximum: number }): Promise<number> {
-    console.log(range)
     return await invoke("get_random_number", {min: range.minimum, max: range.maximum})
 }
 
