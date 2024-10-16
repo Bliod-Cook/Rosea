@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "Rosea",
-  "version": "0.0.2",
-  "identifier": "com.plantendev.rosea",
+  "version": "0.0.3",
+  "identifier": "Rosea",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
