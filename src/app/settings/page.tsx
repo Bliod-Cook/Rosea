@@ -20,6 +20,7 @@ export default function Settings() {
 
     async function saveSettings() {
         if (max !== null && min !== null && max !== undefined && min !== undefined) {
+            console.log(max, min)
             await invoke("set_config", {config: "MIN", value: String(min)});
             await invoke("set_config", {config: "MAX", value: String(max)});
             await close_page()
@@ -55,6 +56,6 @@ async function close_page() {
 }
 
 async function get_config(config: string, default_value: number): Promise<number> {
-    const value: string = await getConfig(config);
-    return value === "null" ? default_value : parseInt(value)
+    const value: string = await getConfig(config, String(default_value));
+    return Number(value)
 }

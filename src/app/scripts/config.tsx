@@ -1,7 +1,7 @@
 import {BaseDirectory, create, exists, readTextFile} from '@tauri-apps/plugin-fs'
 import {parse} from "smol-toml";
 
-export async function getConfig(config: string): Promise<string> {
+export async function getConfig(config: string, defaultValue: string = "null"): Promise<string> {
     if (
         !await exists("config.toml",{baseDir: BaseDirectory.AppData})
     )
@@ -11,9 +11,10 @@ export async function getConfig(config: string): Promise<string> {
     const file: string = await readTextFile("config.toml", {baseDir: BaseDirectory.AppData});
     try {
         const parsedData = parse(file)
-        return String(parsedData[config])
+        const data = parsedData[config]
+        return data === undefined ? defaultValue : String(data)
     } catch (e) {
         console.log(e);
-        return 'null'
+        return defaultValue
     }
 }

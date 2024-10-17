@@ -44,7 +44,7 @@ export default function Random() {
 
     const [mouseOnButton, setMouseOnButton] = useState(false)
     return (
-        <div className={`${styles.middle}`} id={"content"} onMouseDown={mouseOnButton ? () => {} : Drag}>
+        <div className={`${styles.middle}`} id={"content"}  onMouseDown={mouseOnButton ? () => {} : Drag}>
             <div id={"result"} className={`w-full select-none`}>
                 {randomedNumber}
             </div>
