@@ -35,6 +35,7 @@ export default function RandomSettingsPage() {
         configData["random_max"] = input2
         await writeTextFile(
             'config.toml',
+            // @ts-ignore
             TOML.stringify(configData),
             {baseDir: BaseDirectory.AppLocalData}
         )
