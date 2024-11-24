@@ -1,0 +1,8 @@
+div {
+    font-size: 31px;
+    line-height: 1.2;
+    user-select: none;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+}

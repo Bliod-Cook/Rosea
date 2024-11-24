@@ -4,8 +4,8 @@
   "description": "enables the default permissions",
   "windows": [
     "main",
-    "RandomPage",
-    "SettingsPage"
+    "random",
+    "random/settings"
   ],
   "permissions": [
     "core:default",
@@ -21,15 +21,10 @@
     "core:window:allow-start-dragging",
     "core:window:allow-set-position",
     "core:window:allow-get-all-windows",
-    "dialog:default",
-    "dialog:allow-message",
+    "core:app:allow-default-window-icon",
     "fs:default",
-    "fs:allow-appdata-write-recursive",
-    "fs:default",
-    "core:window:allow-destroy",
-    {
-      "identifier": "fs:scope",
-      "allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/**" }]
-    }
+    "fs:allow-applocaldata-write",
+    "fs:allow-applocaldata-meta",
+    "fs:allow-applocaldata-read"
   ]
 }

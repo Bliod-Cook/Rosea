@@ -1,11 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "Rosea",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "identifier": "Rosea",
   "build": {
-    "frontendDist": "../out",
-    "devUrl": "http://localhost:3000",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
@@ -14,7 +14,7 @@
       {
         "title": "rosea",
         "width": 100,
-        "height": 60,
+        "height": 18,
         "resizable": false,
         "fullscreen": false,
         "decorations": false,
@@ -41,8 +41,7 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ],
-    "createUpdaterArtifacts": true
+    ]
   },
   "plugins": {
     "updater": {
