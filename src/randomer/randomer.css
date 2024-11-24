@@ -1,9 +1,27 @@
-body {
+@import "windows-ui-fabric/dist/config/app-config.css";
+@import "windows-ui-fabric/dist/windows-ui.min.css";
+@import "windows-ui-fabric/dist/icons/winui-icons.min.css";
+
+#root {
+    /*width: 130px !important;*/
+    /*height: 100% !important;*/
+    /*display: block !important;*/
+    /*position: absolute !important;*/
+}
+
+.app-progress-container {
     width: 120px;
-    height: 180px;
-    display: block;
     position: absolute;
-    background-color: rgba(255, 255, 255, 80%);
+    margin-top: 10px;
+    right: 8px;
+}
+
+body {
+    /*width: 120px !important;*/
+    /*height: 180px !important;*/
+    /*display: block !important;*/
+    /*position: absolute !important;*/
+    background-color: rgba(255, 255, 255, 80%) !important;
 }
 
 #print {
@@ -27,6 +45,7 @@ body {
 
 button {
     margin: auto;
+    border-radius: 0;
 }
 
 .win10-button {

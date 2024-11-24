@@ -29,6 +29,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      windows-ui-fabric:
+        specifier: ^4.0.2
+        version: 4.0.2
     devDependencies:
       '@eslint/js':
         specifier: ^9.13.0
@@ -1095,6 +1098,9 @@ packages:
     engines: {node: '>= 8'}
     hasBin: true
 
+  windows-ui-fabric@4.0.2:
+    resolution: {integrity: sha512-7XmKzrvldG8yUBZRHQXskQnI6RG4ev3bylqxTa1bGHloGxp9/7Y02nyTDYUjRpSwYLB6ih2kke5gRyW2fhGnnA==}
+
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
@@ -1981,6 +1987,8 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  windows-ui-fabric@4.0.2: {}
 
   word-wrap@1.2.5: {}
 

@@ -8,6 +8,8 @@ import TOML from "@ltd/j-toml";
 
 export default function RandomPage() {
     const [randomNumber, setRandomNumber] = useState(0)
+    const [max, setMax] = useState(0)
+    const [min, setMin] = useState(0)
 
     async function random() {
         if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
@@ -17,8 +19,8 @@ export default function RandomPage() {
             (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
         )
         // TODO: Get Random Number
-        const max = Number(configData["random_max"] ?? 48);
-        const min = Number(configData["random_min"] ?? 1);
+        setMax(Number(configData["random_max"] ?? 48))
+        setMin(Number(configData["random_min"] ?? 1))
         const random_number = Math.floor(
             // @ts-ignore
             chance.integer({min: min, max: max})
@@ -46,6 +48,13 @@ export default function RandomPage() {
             <div id={"buttons"} className={"unselect"}>
                 <button onClick={random} className={"win10-button no-drag"}>抽取</button>
                 <button onClick={changeRandomSettingsPageVisibility} className={"win10-button no-drag"}>设置</button>
+            </div>
+            <div className="app-progress-container">
+                <div className="app-progress-bar">
+                    <span role="progressbar" style={{
+                        width: Number(randomNumber) / (max - min) * 120,
+                    }}></span>
+                </div>
             </div>
         </div>
     )

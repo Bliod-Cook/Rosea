@@ -1,5 +1,6 @@
 import '../../assets/windows-ui.min.css'
 import '../../assets/winui-icons.min.css'
+import '../../assets/windows-ui.min.js'
 import './settings.css'
 import TOML from "@ltd/j-toml"
 import {BaseSyntheticEvent, useState} from "react";
