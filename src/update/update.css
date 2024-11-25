@@ -1,0 +1,21 @@
+@import "windows-ui-fabric/dist/config/app-config.css";
+@import "windows-ui-fabric/dist/windows-ui.min.css";
+@import "windows-ui-fabric/dist/icons/winui-icons.min.css";
+
+.app-m-0 {
+    text-align: center;
+}
+
+.app-progress-container {
+    width: 200px;
+    display: flex;
+    margin: auto;
+}
+
+span {
+    width: 46%;
+}
+
+.root-div {
+    line-height: 2;
+}

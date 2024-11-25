@@ -5,7 +5,8 @@
   "windows": [
     "main",
     "random",
-    "random/settings"
+    "random/settings",
+    "update"
   ],
   "permissions": [
     "core:default",
@@ -25,6 +26,7 @@
     "fs:default",
     "fs:allow-applocaldata-write",
     "fs:allow-applocaldata-meta",
-    "fs:allow-applocaldata-read"
+    "fs:allow-applocaldata-read",
+    "updater:default"
   ]
 }

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.css"
 import {getCurrentWindow} from "@tauri-apps/api/window";
@@ -21,6 +21,27 @@ export default function App() {
             await getCurrentWindow().startDragging()
         }
     }
+
+    useEffect(() => {
+        setInterval(async () => {
+            if (await TauriWebviewWindow.getByLabel("update")) {}
+            else {
+                new TauriWebviewWindow("update", {
+                    url: "/update/",
+                    title: "更新",
+                    width: 250,
+                    height: 180,
+                    transparent: true,
+                    alwaysOnTop: false,
+                    decorations: false,
+                    shadow: false,
+                    resizable: false,
+                    skipTaskbar: true,
+                    visible: false,
+                })
+            }
+        }, 600)
+    }, []);
 
     return (
         <>
