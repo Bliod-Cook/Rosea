@@ -1,3 +1,7 @@
+@import "windows-ui-fabric/dist/config/app-config.css";
+@import "windows-ui-fabric/dist/windows-ui.min.css";
+@import "windows-ui-fabric/dist/icons/winui-icons.min.css";
+
 body {
     background-color: rgba(255, 255, 255, 90%) !important;
 }

@@ -1,6 +1,3 @@
-import '../../assets/windows-ui.min.css'
-import '../../assets/winui-icons.min.css'
-import '../../assets/windows-ui.min.js'
 import './settings.css'
 import TOML from "@ltd/j-toml"
 import {BaseSyntheticEvent, useState} from "react";
@@ -67,7 +64,7 @@ export default function RandomSettingsPage() {
             </div>
         </div>
         <div id={"buttons"}>
-            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "success"} no-drag`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
+            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "primary"} no-drag`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
             <button className={"app-btn no-drag"} onClick={closeWindow}>取消</button>
         </div>
     </div>

@@ -18,6 +18,7 @@ export async function initTray() {
         menu,
         menuOnLeftClick: true,
         icon: await defaultWindowIcon() ?? undefined,
+        id: "default",
     }
 
     await TrayIcon.new(options)
