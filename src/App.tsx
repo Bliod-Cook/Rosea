@@ -26,7 +26,7 @@ export default function App() {
         setInterval(async () => {
             if (await TauriWebviewWindow.getByLabel("update")) {}
             else {
-                new TauriWebviewWindow("update", {
+                return new TauriWebviewWindow("update", {
                     url: "/update/",
                     title: "更新",
                     width: 250,
@@ -40,7 +40,7 @@ export default function App() {
                     visible: false,
                 })
             }
-        }, 600)
+        }, 600000)
     }, []);
 
     return (

@@ -32,7 +32,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src/index.html'),
         randomer: resolve(__dirname, 'src/randomer/index.html'),
-        randomerSettings: resolve(__dirname, 'src/randomer/settings/index.html')
+        randomerSettings: resolve(__dirname, 'src/randomer/settings/index.html'),
+        update: resolve(__dirname, 'src/update/index.html')
       },
     },
   },
