@@ -12,7 +12,8 @@ export function initPage() {
         shadow: false,
         resizable: false,
         skipTaskbar: true,
-        visible: false
+        visible: false,
+        dragDropEnabled: false
     })
 
     new TauriWebviewWindow("random/settings", {
@@ -27,5 +28,6 @@ export function initPage() {
         resizable: false,
         skipTaskbar: true,
         visible: false,
+        dragDropEnabled: false
     })
 }
