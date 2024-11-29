@@ -16,9 +16,10 @@ export default function App() {
         await tWindow?.isVisible() ? await tWindow?.hide() : await tWindow?.show()
     }
 
-    async function startDrag() {
+    async function startDrag(e: { preventDefault: () => void; }) {
+        e.preventDefault();
         if (moveable) {
-            await getCurrentWindow().startDragging()
+           await getCurrentWindow().startDragging()
         }
     }
 
@@ -45,7 +46,12 @@ export default function App() {
 
     return (
         <>
-            <div id={"main-div"} onClick={changeRandomPageVisibility} onDoubleClick={() => {setMoveable(!moveable)}} onDragStart={startDrag} draggable={moveable}>
+            <div id={"main-div"}
+                 onClick={changeRandomPageVisibility}
+                 onDoubleClick={() => {setMoveable(!moveable)}}
+                 onDragStart={startDrag}
+                 onScroll={(e) => {e.preventDefault()}}
+                 draggable={moveable}>
                 {time}
             </div>
         </>
