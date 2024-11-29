@@ -9,7 +9,7 @@ initPage()
 await initTray()
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
+    <StrictMode >
         <App/>
     </StrictMode>,
 )

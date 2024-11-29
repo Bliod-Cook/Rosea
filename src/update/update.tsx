@@ -1,5 +1,5 @@
 import "./update.css"
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 export default function Update() {
@@ -7,7 +7,8 @@ export default function Update() {
     const [contentLength, setContentLength] = useState(0)
     const [downloaded, setDownloaded] = useState(0)
 
-    useEffect(() => {
+
+    useState(((): number => {
         try {
             check().then(async (update) => {
                 if (update) {
@@ -31,7 +32,8 @@ export default function Update() {
             })
         } catch (e) {}
         getCurrentWindow().close().then()
-    }, []);
+        return 1
+    })())
 
     return <div className={"root-div"}>
         <h1 className="app-m-0">{isStart ? ((downloaded/contentLength)*100 + "%") : "wait"}</h1>

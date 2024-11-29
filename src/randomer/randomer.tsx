@@ -41,7 +41,7 @@ export default function RandomPage() {
     }
 
     return (
-        <div className={"background"} onMouseDown={startDrag}>
+        <div className={"background"} onMouseDown={startDrag} onScroll={(e) => {e.preventDefault()}}>
             <div id={"print"} className={"unselect"}>
                 <div id={"number"}>{randomNumber}</div>
             </div>

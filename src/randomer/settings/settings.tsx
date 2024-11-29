@@ -40,7 +40,7 @@ export default function RandomSettingsPage() {
         await getCurrentWindow().hide()
     }
 
-    return <div className={"background"} onMouseDown={startDrag}>
+    return <div className={"background"} onMouseDown={startDrag} onScroll={(e) => {e.preventDefault()}}>
         <div id={"InputBars"}>
             <div className={"center"}>
                 <p className={"unselect"}>最小</p>
