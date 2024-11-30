@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.css"
-import {getCurrentWindow} from "@tauri-apps/api/window";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -14,13 +13,6 @@ export default function App() {
     async function changeRandomPageVisibility() {
         const tWindow = await TauriWebviewWindow.getByLabel("random")
         await tWindow?.isVisible() ? await tWindow?.hide() : await tWindow?.show()
-    }
-
-    async function startDrag(e: { preventDefault: () => void; }) {
-        e.preventDefault();
-        if (moveable) {
-           await getCurrentWindow().startDragging()
-        }
     }
 
     useEffect(() => {
@@ -47,11 +39,10 @@ export default function App() {
     return (
         <>
             <div id={"main-div"}
+                 data-tauri-drag-region={moveable ? "true" : undefined}
                  onClick={changeRandomPageVisibility}
                  onDoubleClick={() => {setMoveable(!moveable)}}
-                 onDragStart={startDrag}
-                 onScroll={(e) => {e.preventDefault()}}
-                 draggable={moveable}>
+                 onScroll={(e) => {e.preventDefault()}}>
                 {time}
             </div>
         </>
