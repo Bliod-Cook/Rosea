@@ -41,21 +41,28 @@ export default function RandomPage() {
     }
 
     return (
-        <div className={"background"} onMouseDown={startDrag} onScroll={(e) => {e.preventDefault()}}>
-            <div id={"print"} className={"unselect"}>
-                <div id={"number"}>{randomNumber}</div>
-            </div>
-            <div id={"buttons"} className={"unselect"}>
-                <button onClick={random} className={"win10-button no-drag"}>抽取</button>
-                <button onClick={changeRandomSettingsPageVisibility} className={"win10-button no-drag"}>设置</button>
-            </div>
-            <div className="app-progress-container">
-                <div className="app-progress-bar">
+        <>
+            <div className={"background"}
+                 onMouseDown={startDrag}
+                 onScroll={(e) => {
+                     e.preventDefault()
+                 }}
+            >
+                <div id={"print"} className={"unselect"}>
+                    <div id={"number"}>{randomNumber}</div>
+                </div>
+                <div id={"buttons"} className={"unselect"}>
+                    <button onClick={random} className={"win10-button"}>抽取</button>
+                    <button onClick={changeRandomSettingsPageVisibility} className={"win10-button"}>设置</button>
+                </div>
+                <div className="app-progress-container">
+                    <div className="app-progress-bar">
                     <span role="progressbar" style={{
                         width: Number(randomNumber) / (max - min) * 120,
                     }}></span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }

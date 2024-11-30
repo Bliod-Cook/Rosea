@@ -26,7 +26,8 @@
         "dragDropEnabled": false,
         "contentProtected": true,
         "x": 0,
-        "y": 0
+        "y": 0,
+        "zoomHotkeysEnabled": false
       }
     ],
     "security": {
