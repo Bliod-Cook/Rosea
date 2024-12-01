@@ -41,11 +41,12 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          run_install: true
-          version: "latest-10"
+          run_install: false
+          version: "10"
 
       - name: no updater
         run: |
+          pnpm i
           rm src-tauri/tauri.conf.json
           mv src-tauri/tauri.conf.devbuild.json src-tauri/tauri.conf.json
 
