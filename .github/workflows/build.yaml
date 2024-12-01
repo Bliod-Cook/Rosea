@@ -46,6 +46,7 @@ jobs:
 
       - name: no updater
         run: |
+          pnpm update
           pnpm i
           rm src-tauri/tauri.conf.json
           mv src-tauri/tauri.conf.devbuild.json src-tauri/tauri.conf.json
