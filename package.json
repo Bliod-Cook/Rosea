@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tauri dev",
-    "build": "tauri build",
+    "dev": "cargo tauri dev",
+    "build": "cargo tauri build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
