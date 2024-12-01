@@ -49,7 +49,7 @@ jobs:
       - name: install frontend dependencies
         run: | 
           yarn install
-          rm src-tauri/tauri.conf.json -rf
+          rm src-tauri/tauri.conf.json
           mv src-tauri/tauri.conf.devbuild.json src-tauri/tauri.conf.json
 
       # If tagName and releaseId are omitted tauri-action will only build the app and won't try to upload any assets.
