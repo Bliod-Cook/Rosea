@@ -6,7 +6,7 @@ import {initPage} from "./pages.ts";
 import {initTray} from "./tray.ts";
 
 initPage()
-await initTray()
+initTray().then()
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode >
