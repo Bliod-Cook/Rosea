@@ -12,6 +12,7 @@ export default function RandomPage() {
     const [min, setMin] = useState(0)
 
     async function random() {
+        console.log("Random")
         if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
             await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
         }
@@ -19,11 +20,13 @@ export default function RandomPage() {
             (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
         )
         // TODO: Get Random Number
-        setMax(Number(configData["random_max"] ?? 48))
-        setMin(Number(configData["random_min"] ?? 1))
+        const maxN = Number(configData["random_max"] ?? 48)
+        const minN = Number(configData["random_min"] ?? 1)
+        setMax(maxN)
+        setMin(minN)
         const random_number = Math.floor(
             // @ts-ignore
-            chance.integer({min: min, max: max})
+            chance.integer({min: minN, max: maxN})
         )
         setRandomNumber(
             random_number
@@ -52,13 +55,13 @@ export default function RandomPage() {
                     <div id={"number"}>{randomNumber}</div>
                 </div>
                 <div id={"buttons"} className={"unselect"}>
-                    <button onClick={random} className={"win10-button"}>抽取</button>
-                    <button onClick={changeRandomSettingsPageVisibility} className={"win10-button"}>设置</button>
+                    <button onClick={random} className={"win10-button no-drag"}>抽取</button>
+                    <button onClick={changeRandomSettingsPageVisibility} className={"win10-button no-drag"}>设置</button>
                 </div>
                 <div className="app-progress-container">
                     <div className="app-progress-bar">
                     <span role="progressbar" style={{
-                        width: Number(randomNumber) / (max - min) * 120,
+                        width: isNaN(Number(randomNumber) / (max - min) * 120) ? 1 : Number(randomNumber) / (max - min) * 120,
                     }}></span>
                     </div>
                 </div>
