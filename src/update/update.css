@@ -19,3 +19,7 @@ span {
 .root-div {
     line-height: 2;
 }
+
+body {
+    overflow: hidden;
+}
