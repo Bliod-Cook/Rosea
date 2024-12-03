@@ -16,8 +16,10 @@ export default function RandomPage() {
         if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
             await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
         }
+        const config = (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
+        console.log(config)
         const configData = TOML.parse(
-            (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
+            config
         )
         // TODO: Get Random Number
         const maxN = Number(configData["random_max"] ?? 48)
