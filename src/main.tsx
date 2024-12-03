@@ -2,11 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import "./index.css"
-import {initPage} from "./pages.ts";
-import {initTray} from "./tray.ts";
+import {initPage} from "./init/pages.ts";
+import {initTray} from "./init/tray.ts";
+import {initUpdate} from "./init/update.ts";
 
+initTray()
 initPage()
-initTray().then()
+initUpdate()
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode >

@@ -92,7 +92,7 @@ checksum = "4c95c10ba0b00a02636238b814946408b1322d5ac4760326e6fb8ec956d85775"
 
 [[package]]
 name = "app"
-version = "0.0.9"
+version = "0.0.11"
 dependencies = [
  "log",
  "serde",
@@ -101,6 +101,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-fs",
  "tauri-plugin-log",
+ "tauri-plugin-positioner",
  "tauri-plugin-updater",
 ]
 
@@ -3767,9 +3768,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-fs"
-version = "2.0.3"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96ba7d46e86db8c830d143ef90ab5a453328365b0cc834c24edea4267b16aba0"
+checksum = "0cdaf6701ee5efc83161cf41004aa5aec4d255c9fb2d2b11fe518fe506acc588"
 dependencies = [
  "anyhow",
  "dunce",
@@ -3781,16 +3782,18 @@ dependencies = [
  "serde_repr",
  "tauri",
  "tauri-plugin",
- "thiserror 1.0.69",
+ "tauri-utils",
+ "thiserror 2.0.3",
+ "toml 0.8.2",
  "url",
  "uuid",
 ]
 
 [[package]]
 name = "tauri-plugin-log"
-version = "2.0.2"
+version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8aa13d15daf90230ba26d5a9b4a4612975fa64ce17290cb7f6e0f89bb6997d82"
+checksum = "0f4607e2ab524ef1b732b379e7915441aec66d467b7a9721414786032e42e0ee"
 dependencies = [
  "android_logger",
  "byte-unit",
@@ -3804,15 +3807,30 @@ dependencies = [
  "swift-rs",
  "tauri",
  "tauri-plugin",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
 ]
 
 [[package]]
-name = "tauri-plugin-updater"
-version = "2.0.2"
+name = "tauri-plugin-positioner"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1dd3d2fe0f02bf52eebb5a9d23b987fffac6684646ab6fd683d706dafb18da87"
+checksum = "7a294f7203c43be423fc8328722ea8408cdf5336e4f4cda0f4504ae3e44f4a27"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.3",
+]
+
+[[package]]
+name = "tauri-plugin-updater"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50ba9adaede60b0df5e0764692c6ac176eb133aade95d326bddeb968ad793320"
 dependencies = [
  "base64 0.22.1",
  "dirs",
@@ -3830,7 +3848,7 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "time",
  "tokio",
  "url",
