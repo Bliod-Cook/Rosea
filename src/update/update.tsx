@@ -1,4 +1,4 @@
-import "./update.css"
+import "./update.scss"
 import {useEffect, useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
