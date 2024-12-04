@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
-import "./App.css"
+import "./App.scss"
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())

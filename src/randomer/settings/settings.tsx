@@ -1,4 +1,4 @@
-import './settings.css'
+import './settings.scss'
 import TOML from "@ltd/j-toml"
 import {BaseSyntheticEvent, useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
@@ -29,8 +29,8 @@ export default function RandomSettingsPage() {
         const configData = TOML.parse(
             (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
         )
-        configData["random_min"] = input1
-        configData["random_max"] = input2
+        configData["random_min"] = String(Number(input1))
+        configData["random_max"] = String(Number(input2))
         await writeTextFile(
             'config.toml',
             // @ts-ignore
@@ -72,5 +72,7 @@ export default function RandomSettingsPage() {
 
 function isIllegal(i: string): boolean {
     if (i.length === 0) return true
+    if (!Number.isInteger(Number(i))) return true
+    console.log(Number.isInteger(i))
     return isNaN(Number(i))
 }
