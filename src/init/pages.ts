@@ -13,7 +13,6 @@ export function initPage() {
         resizable: false,
         skipTaskbar: true,
         visible: false,
-        dragDropEnabled: false,
         zoomHotkeysEnabled: false,
         devtools: true
     })
@@ -30,7 +29,6 @@ export function initPage() {
         resizable: false,
         skipTaskbar: true,
         visible: false,
-        dragDropEnabled: false,
         zoomHotkeysEnabled: false
     })
 }

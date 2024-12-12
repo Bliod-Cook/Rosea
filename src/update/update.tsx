@@ -17,10 +17,10 @@ export default function Update() {
         try {
             check().then(async (update) => {
                 if (update) {
-                    await getCurrentWindow().show()
                     await update.downloadAndInstall((event) => {
                         switch (event.event) {
                             case "Started":
+                                getCurrentWindow().show()
                                 if (event.data.contentLength) {
                                     setIsStart(true)
                                     setContentLength(event.data.contentLength)
