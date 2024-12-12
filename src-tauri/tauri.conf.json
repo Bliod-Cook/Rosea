@@ -23,7 +23,6 @@
         "transparent": true,
         "shadow": false,
         "focus": false,
-        "dragDropEnabled": false,
         "contentProtected": true,
         "x": 0,
         "y": 0,
