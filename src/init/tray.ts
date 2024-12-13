@@ -13,7 +13,7 @@ export async function initTray() {
             {
                 id: "movable",
                 text: "Movable ×",
-                action: ()=>{emit("change_movable").then(); moveable = !moveable}
+                action: ()=>{moveable = !moveable; emit("change_movable").then()}
             },
             {
                 id: "Quit",
@@ -33,13 +33,17 @@ export async function initTray() {
     await TrayIcon.new(options)
 }
 
+export function getMovable() {
+    return moveable
+}
+
 async function changeTray()  {
     const menu = await Menu.new({
         items: [
             {
                 id: "movable",
                 text: `Movable ${moveable?"√":"×"}`,
-                action: ()=>{emit("change_movable").then(); moveable = !moveable}
+                action: ()=>{moveable = !moveable; emit("change_movable").then()}
             },
             {
                 id: "Quit",

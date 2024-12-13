@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
+import {getMovable} from "./init/tray.ts";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -12,7 +13,7 @@ export default function App() {
     const [moveable, setMoveable] = useState(false)
 
     function changeMoveable() {
-        setMoveable(!moveable)
+        setMoveable(getMovable)
     }
 
     useEffect(() => {
