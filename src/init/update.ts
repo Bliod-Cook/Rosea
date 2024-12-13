@@ -17,6 +17,7 @@ export async function initUpdate() {
                     resizable: false,
                     skipTaskbar: true,
                     visible: false,
+                    maximizable: false
                 })
             }
         },

@@ -1,4 +1,4 @@
-import {BaseSyntheticEvent, useState} from "react";
+import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
@@ -6,11 +6,20 @@ import {getCurrentWindow} from "@tauri-apps/api/window";
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
     setInterval(() => {
-        getCurrentWindow().isFullscreen().then((e) => {if (e) {getCurrentWindow().setFullscreen(false).then()}})
         setTime((new Date()).toLocaleTimeString())
     }, 1000)
 
     const [moveable, setMoveable] = useState(false)
+
+    function changeMoveable() {
+        setMoveable(!moveable)
+    }
+
+    useEffect(() => {
+        getCurrentWindow().listen("change_movable", () => {
+            changeMoveable()
+        })
+    });
 
     async function changeRandomPageVisibility() {
         const tWindow = await TauriWebviewWindow.getByLabel("random")
@@ -28,13 +37,8 @@ export default function App() {
         <>
             <div id={"main-div"}
                  onClick={changeRandomPageVisibility}
-                 onDoubleClick={() => {setMoveable(!moveable)}}
-                 tauri-drag={moveable?"true":undefined}
-                 // onTouchStart={startDrag}
-                 // onTouchMove={startDrag}
-                 // onDragStart={startDrag}
-                 draggable={false}
-                 onScroll={(e) => {e.preventDefault()}}>
+                 className={`${moveable?"tauri-drag":undefined}`}
+                 draggable={false}>
                 {time}
             </div>
         </>
