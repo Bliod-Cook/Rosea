@@ -29,6 +29,7 @@ export function initPage() {
         resizable: false,
         skipTaskbar: true,
         visible: false,
-        zoomHotkeysEnabled: false
+        zoomHotkeysEnabled: false,
+        fullscreen: false
     })
 }

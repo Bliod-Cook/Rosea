@@ -10,3 +10,7 @@ div {
 body {
     overflow: hidden;
 }
+
+[tauri-drag] {
+    app-region: drag;
+}
