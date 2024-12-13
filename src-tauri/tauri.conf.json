@@ -26,7 +26,8 @@
         "contentProtected": true,
         "x": 0,
         "y": 0,
-        "zoomHotkeysEnabled": false
+        "zoomHotkeysEnabled": false,
+        "maximizable": false
       }
     ],
     "security": {
