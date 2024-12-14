@@ -14,7 +14,7 @@ export function initPage() {
         skipTaskbar: true,
         visible: false,
         zoomHotkeysEnabled: false,
-        devtools: true
+        maximizable: false
     })
 
     new TauriWebviewWindow("random/settings", {
@@ -29,6 +29,8 @@ export function initPage() {
         resizable: false,
         skipTaskbar: true,
         visible: false,
-        zoomHotkeysEnabled: false
+        zoomHotkeysEnabled: false,
+        fullscreen: false,
+        maximizable: false
     })
 }
