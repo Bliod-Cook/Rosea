@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
-import {getMovable} from "./init/tray.ts";
+import {moveable as gMoveable, click_through as gClickThrough} from "./init/tray.ts";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -13,13 +13,16 @@ export default function App() {
     const [moveable, setMoveable] = useState(false)
 
     function changeMoveable() {
-        setMoveable(getMovable)
+        setMoveable(gMoveable);
     }
 
     useEffect(() => {
         getCurrentWindow().listen("change_movable", () => {
             changeMoveable()
-        })
+        }).then()
+        getCurrentWindow().listen("change_click_through", () => {
+            gClickThrough ? getCurrentWindow().setIgnoreCursorEvents(true) : getCurrentWindow().setIgnoreCursorEvents(false)
+        }).then()
     });
 
     async function changeRandomPageVisibility() {

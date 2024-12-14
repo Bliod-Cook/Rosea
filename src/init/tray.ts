@@ -2,39 +2,19 @@ import { TrayIcon } from "@tauri-apps/api/tray";
 import {defaultWindowIcon} from "@tauri-apps/api/app";
 import {Menu} from "@tauri-apps/api/menu";
 import {invoke} from "@tauri-apps/api/core";
-import {emit, listen} from "@tauri-apps/api/event";
+import {emit} from "@tauri-apps/api/event";
 
-let moveable = false;
-listen("change_movable", () => {changeTray()})
+const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
+    menuOnLeftClick: true,
+    icon: await defaultWindowIcon() ?? undefined,
+    id: "default",
+})
+
+export let moveable = false;
+export let click_through = false;
 
 export async function initTray() {
-    const menu = await Menu.new({
-        items: [
-            {
-                id: "movable",
-                text: "Movable ×",
-                action: ()=>{moveable = !moveable; emit("change_movable").then()}
-            },
-            {
-                id: "Quit",
-                text: "Quit",
-                action: quit,
-            },
-        ]
-    })
-
-    const options = {
-        menu,
-        menuOnLeftClick: true,
-        icon: await defaultWindowIcon() ?? undefined,
-        id: "default",
-    }
-
-    await TrayIcon.new(options)
-}
-
-export function getMovable() {
-    return moveable
+    await changeTray()
 }
 
 async function changeTray()  {
@@ -43,7 +23,12 @@ async function changeTray()  {
             {
                 id: "movable",
                 text: `Movable ${moveable?"√":"×"}`,
-                action: ()=>{moveable = !moveable; emit("change_movable").then()}
+                action: () => {moveable = !moveable; emit("change_movable").then(()=>{changeTray()})}
+            },
+            {
+                id: "click_through",
+                text: `ClickThrough ${click_through?"√":"×"}`,
+                action: () => {click_through = !click_through; emit("change_click_through").then(()=>{changeTray()})}
             },
             {
                 id: "Quit",
@@ -53,9 +38,7 @@ async function changeTray()  {
         ]
     })
 
-    const tray = await TrayIcon.getById("default")
-
-    await tray?.setMenu(menu)
+    await tray.setMenu(menu)
 }
 
 function quit() {
