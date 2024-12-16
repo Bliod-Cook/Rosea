@@ -1,7 +1,7 @@
+import "../assets/global.scss"
 import "./randomer.scss"
-import {BaseSyntheticEvent, useState} from "react";
+import {useState} from "react";
 // import "./chance.js"
-import {getCurrentWindow} from "@tauri-apps/api/window";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {BaseDirectory, create, exists, readTextFile} from "@tauri-apps/plugin-fs";
 import TOML from "@ltd/j-toml";
@@ -42,15 +42,9 @@ export default function RandomPage() {
         await tWindow?.isVisible() ? await tWindow?.hide() : await tWindow?.show()
     }
 
-    async function startDrag(e: BaseSyntheticEvent) {
-        if (e.target.classList.contains(["no-drag"])) { return }
-        await getCurrentWindow().startDragging()
-    }
-
     return (
         <>
-            <div className={"background"}
-                 onMouseDown={startDrag}
+            <div className={"background drag-region"}
                  onScroll={(e) => {
                      e.preventDefault()
                  }}
@@ -59,8 +53,8 @@ export default function RandomPage() {
                     <div id={"number"}>{randomNumber}</div>
                 </div>
                 <div id={"buttons"} className={"unselect"}>
-                    <button onClick={random} className={"win10-button no-drag"}>抽取</button>
-                    <button onClick={changeRandomSettingsPageVisibility} className={"win10-button no-drag"}>设置</button>
+                    <button onClick={random} className={"win10-button no-drag-region"}>抽取</button>
+                    <button onClick={changeRandomSettingsPageVisibility} className={"win10-button no-drag-region"}>设置</button>
                 </div>
                 <div className="app-progress-container">
                     <div className="app-progress-bar">
