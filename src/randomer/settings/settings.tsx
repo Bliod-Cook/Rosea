@@ -1,17 +1,13 @@
+import "../../assets/global.scss"
 import './settings.scss'
 import TOML from "@ltd/j-toml"
-import {BaseSyntheticEvent, useState} from "react";
+import {useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
 
 export default function RandomSettingsPage() {
     const [input1, setInput1] = useState("");
     const [input2, setInput2] = useState("");
-
-    async function startDrag(e: BaseSyntheticEvent) {
-        if (e.target.classList.contains(["no-drag"])) { return }
-        await getCurrentWindow().startDragging()
-    }
 
     async function closeWindow() {
         await getCurrentWindow().hide();
@@ -40,13 +36,13 @@ export default function RandomSettingsPage() {
         await getCurrentWindow().hide()
     }
 
-    return <div className={"background"} onMouseDown={startDrag} onScroll={(e) => {e.preventDefault()}}>
+    return <div className={"background drag-region"} onScroll={(e) => {e.preventDefault()}}>
         <div id={"InputBars"}>
             <div className={"center"}>
                 <p className={"unselect"}>最小</p>
                 <div id={"InputMin"}
-                     className={`app-input-container no-drag ${isIllegal(input1) ? "input-danger" : "input-success"}`}>
-                    <input className={"app-input-text no-drag"} onChange={(c) => {setInput1(c.target.value)}} value={input1}/>
+                     className={`app-input-container no-drag-region ${isIllegal(input1) ? "input-danger" : "input-success"}`}>
+                    <input className={"app-input-text no-drag-region"} onChange={(c) => {setInput1(c.target.value)}} value={input1}/>
                     <div className="app-input-end-content">
                         <i className="icons10-status"></i>
                     </div>
@@ -64,8 +60,8 @@ export default function RandomSettingsPage() {
             </div>
         </div>
         <div id={"buttons"}>
-            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "primary"} no-drag`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
-            <button className={"app-btn no-drag"} onClick={closeWindow}>取消</button>
+            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "primary"} no-drag-region`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
+            <button className={"app-btn no-drag-region"} onClick={closeWindow}>取消</button>
         </div>
     </div>
 }
