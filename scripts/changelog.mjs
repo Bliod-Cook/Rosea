@@ -11,11 +11,15 @@ console.log(`CHANGELOG=${log}`);
 
 // parse the CHANGELOG.md
 async function resolveUpdateLog() {
-    const tag = process.argv[0]
     const cwd = process.cwd();
 
     const reTitle = /^## v[\d.]+/;
     const reEnd = /^---/;
+
+    const tauri_config_file = await fsp.readFile(path.join(cwd, "src-tauri/tauri.conf.json"), "utf-8")
+    const json_tauri_config_file = JSON.parse(tauri_config_file)
+
+    const tag = json_tauri_config_file["version"]
 
     const file = path.join(cwd, CHANGE_LOG);
 
