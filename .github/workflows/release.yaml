@@ -52,6 +52,11 @@ jobs:
           pnpm update
           pnpm i
 
+      - name: CHANGELOG
+        id: changelog
+        run: |
+          node scripts/changelog.mjs >> "$GITHUB_OUTPUT"
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,7 +65,7 @@ jobs:
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: "App v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
+          releaseBody: ${{ steps.changelog.outputs.CHANGELOG}}
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}

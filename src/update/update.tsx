@@ -14,6 +14,7 @@ export default function Update() {
     }, []);
 
     useState(((): number => {
+        let downloaded_length = 0;
         try {
             check().then(async (update) => {
                 if (update) {
@@ -27,7 +28,8 @@ export default function Update() {
                                 }
                                 break;
                             case "Progress":
-                                setDownloaded(downloaded + event.data.chunkLength)
+                                downloaded_length += event.data.chunkLength
+                                setDownloaded(downloaded_length)
                                 break;
                             case "Finished":
                                 break;
