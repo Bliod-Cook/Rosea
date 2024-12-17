@@ -7,13 +7,13 @@ const CHANGE_LOG = "CHANGELOG.md";
 
 const log = await resolveUpdateLog()
 
-console.log(`CHANGELOG=${log}`);
+console.log(`CHANGELOG="${log}"`);
 
 // parse the CHANGELOG.md
 async function resolveUpdateLog() {
     const cwd = process.cwd();
 
-    const reTitle = /^## v[\d.]+/;
+    const reTitle = /^## [\d.]+/;
     const reEnd = /^---/;
 
     const tauri_config_file = await fsp.readFile(path.join(cwd, "src-tauri/tauri.conf.json"), "utf-8")
@@ -51,5 +51,5 @@ async function resolveUpdateLog() {
         throw new Error(`could not found "${tag}" in CHANGELOG.md`);
     }
 
-    return map[tag].join("\n").trim();
+    return map[tag].join(`\n`).trim();
 }
