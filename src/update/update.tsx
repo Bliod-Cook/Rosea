@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {moveWindow, Position} from '@tauri-apps/plugin-positioner';
+import {emit} from "@tauri-apps/api/event";
 
 export default function Update() {
     const [isStart, setIsStart] = useState(false)
@@ -36,7 +37,9 @@ export default function Update() {
                         }
                     })
                 }
+                await emit("newest-version")
                 getCurrentWindow().close().then()
+                // getCurrentWindow().show().then()
             })
         } catch (e) {}
         return 1

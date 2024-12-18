@@ -28,6 +28,12 @@
     "fs:allow-applocaldata-write",
     "fs:allow-applocaldata-meta",
     "fs:allow-applocaldata-read",
-    "updater:default"
+    "updater:default",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-notify",
+    "notification:allow-permission-state",
+    "notification:allow-request-permission",
+    "positioner:default"
   ]
 }
