@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2.0.0-rc",
   "productName": "Rosea",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "identifier": "Rosea",
   "build": {
     "frontendDist": "../dist",
@@ -39,10 +39,9 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
+      "icons/32.jpg",
+      "icons/128.jpg",
+      "icons/64.jpg",
       "icons/icon.ico"
     ]
   },
@@ -50,6 +49,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM0MTYzNzI3RTJENkMyNjkKUldScHd0YmlKemNXTkkwZFJHSHV1UThtWmRENTBwUW8yRWhCbzBBbDFYL2F1REoza1hqNHNaTjQK",
       "endpoints": [
+        "https://rosea-proxy.bliod.eu.org",
         "https://ghp.ci/https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json",
         "https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json"
       ]

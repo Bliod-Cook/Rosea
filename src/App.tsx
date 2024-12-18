@@ -30,13 +30,6 @@ export default function App() {
         await tWindow?.isVisible() ? await tWindow?.hide() : await tWindow?.show()
     }
 
-    // async function startDrag(e: BaseSyntheticEvent) {
-    //     e.preventDefault()
-    //     if (moveable) {
-    //         await getCurrentWindow().startDragging()
-    //     }
-    // }
-
     return (
         <>
             <div id={"main-div"}
