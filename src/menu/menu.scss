@@ -1,0 +1,45 @@
+html {
+  overflow: hidden;
+}
+
+body {
+  background-color: rgba(0,0,0,30%);
+}
+
+.main {
+  display: flex;
+}
+
+.menu-icon {
+  app-region: drag;
+  margin-top: -3px;
+  margin-left: -3px;
+  opacity: 0.7;
+  display: flex;
+  width: 32px;
+  height: 32px;
+  user-select: none;
+}
+
+.random-icon {
+  margin-top: -4px;
+  margin-left: 8px;
+  width: 32px;
+  height: 32px;
+
+  &.disabled {
+    content: url("../assets/random-onFocus.png");
+
+    &:hover {
+      content: url("../assets/random.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/random-onFocus-enabled.png");
+
+    &:hover {
+      content: url("../assets/random-enabled.png");
+    }
+  }
+}
