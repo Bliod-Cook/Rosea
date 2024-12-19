@@ -1,0 +1,96 @@
+html {
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: column;
+}
+
+.main {
+  border-radius: 20px;
+  height: 100vh;
+  display: flex;
+  background-color: rgba(0,0,0,30%);
+}
+
+.menu-icon {
+  app-region: drag;
+  margin-top: 4px;
+  margin-left: 4px;
+  opacity: 0.7;
+  display: flex;
+  width: 32px;
+  height: 32px;
+  user-select: none;
+}
+
+.icons-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.random-icon {
+  margin-top: 4px;
+  margin-left: 8px;
+  width: 32px;
+  height: 32px;
+
+  &.disabled {
+    content: url("../assets/random-onFocus.png");
+
+    &:hover {
+      content: url("../assets/random.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/random-onFocus-enabled.png");
+
+    &:hover {
+      content: url("../assets/random-enabled.png");
+    }
+  }
+}
+
+.lock-icon {
+  margin-top: 4px;
+  margin-left: 6px;
+  width: 32px;
+  height: 32px;
+
+  &.disabled {
+    content: url("../assets/lock-locked.png");
+
+    &:hover {
+      content: url("../assets/lock-onFocus-locked.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/lock-unlocked.png");
+
+    &:hover {
+      content: url("../assets/lock-onFocus-unlocked.png");
+    }
+  }
+}
+
+.click-through-icon {
+  margin-top: 4px;
+  margin-left: 6px;
+  width: 32px;
+  height: 32px;
+
+  &.disabled {
+    content: url("../assets/click_through.png");
+  }
+
+  &.enabled {
+    content: url("../assets/click_through-enabled.png");
+  }
+}

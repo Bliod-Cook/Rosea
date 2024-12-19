@@ -6,7 +6,8 @@
     "main",
     "random",
     "random/settings",
-    "update"
+    "update",
+    "menu"
   ],
   "permissions": [
     "core:default",
@@ -22,12 +23,19 @@
     "core:webview:allow-create-webview",
     "core:window:allow-start-dragging",
     "core:window:allow-set-position",
+    "core:window:allow-set-size",
     "core:window:allow-get-all-windows",
     "core:app:allow-default-window-icon",
     "fs:default",
     "fs:allow-applocaldata-write",
     "fs:allow-applocaldata-meta",
     "fs:allow-applocaldata-read",
-    "updater:default"
+    "updater:default",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-notify",
+    "notification:allow-permission-state",
+    "notification:allow-request-permission",
+    "positioner:default"
   ]
 }
