@@ -27,7 +27,7 @@ export default function Menu() {
     }
 
     return <div className={"main"}>
-        <img alt={"menu-icon"} src={"/assets/icon.svg"} className={"menu-icon"} onClick={changeOpen}/>
+        <img alt={"menu-icon"} src={"../assets/icon.svg"} className={"menu-icon"} onClick={changeOpen}/>
         {
             (!open) ? undefined : <div className={"icons-bar"}>
                 <div className={`random-icon ${randomPageOpened ? "enabled" : "disabled"}`} onClick={async () => {
