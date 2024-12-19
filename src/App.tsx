@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {moveable as gMoveable, click_through as gClickThrough} from "./init/tray.ts";
@@ -17,7 +16,7 @@ export default function App() {
     }
 
     useEffect(() => {
-        getCurrentWindow().listen("change_movable", () => {
+        getCurrentWindow().listen("change_moveable", () => {
             changeMoveable()
         }).then()
         getCurrentWindow().listen("change_click_through", () => {
@@ -25,15 +24,9 @@ export default function App() {
         }).then()
     });
 
-    async function changeRandomPageVisibility() {
-        const tWindow = await TauriWebviewWindow.getByLabel("random")
-        await tWindow?.isVisible() ? await tWindow?.hide() : await tWindow?.show()
-    }
-
     return (
         <>
             <div id={"main-div"}
-                 onClick={changeRandomPageVisibility}
                  className={`${moveable?"tauri-drag":undefined}`}
                  draggable={false}>
                 {time}

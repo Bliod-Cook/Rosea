@@ -24,9 +24,9 @@ async function changeTray()  {
     const menu = await Menu.new({
         items: [
             {
-                id: "movable",
-                text: `Movable ${moveable?"√":"×"}`,
-                action: () => {moveable = !moveable; emit("change_movable").then(()=>{changeTray()})}
+                id: "moveable",
+                text: `Moveable ${moveable?"√":"×"}`,
+                action: () => {moveable = !moveable; emit("change_moveable").then(()=>{changeTray()})}
             },
             {
                 id: "click_through",
@@ -67,6 +67,18 @@ listen("newest-version", async () => {
         manual_update_check = false
     }
 }).then()
+
+listen("change-lock",()=>{
+    moveable = !moveable; emit("change_moveable").then(()=>{changeTray().then()})
+}).then()
+
+listen("change-click_through",()=>{
+    click_through = !click_through; emit("change_click_through").then(()=>{changeTray()})
+}).then()
+
+export function getMovable() {
+    return moveable
+}
 
 function quit() {
     invoke("quit").then()

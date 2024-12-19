@@ -4,8 +4,8 @@ export function initPage() {
     new TauriWebviewWindow("menu", {
         url: "/menu/",
         title: "Menu",
-        width: 128,
-        height: 128,
+        width: 40,
+        height: 40,
         transparent: true,
         alwaysOnTop: true,
         decorations: false,
