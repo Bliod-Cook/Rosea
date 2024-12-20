@@ -28,7 +28,9 @@ export default function App() {
         <>
             <div id={"main-div"}
                  className={`${moveable?"tauri-drag":undefined}`}
-                 draggable={false}>
+                 draggable={false}
+                 onContextMenu={(e)=>{e.preventDefault()}}
+            >
                 {time}
             </div>
         </>
