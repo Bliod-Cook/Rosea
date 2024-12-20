@@ -13,9 +13,17 @@ body {
 
 .main {
   border-radius: 20px;
+  width: 40px;
   height: 100vh;
   display: flex;
   background-color: rgba(0,0,0,30%);
+  overflow: hidden;
+
+  transition: width 0.5s ease;
+
+  &.enabled {
+    width: 100%;
+  }
 }
 
 .menu-icon {
@@ -28,6 +36,13 @@ body {
   height: 32px;
   user-select: none;
   content: url("../assets/icon.svg");
+
+  transition: transform 0.5s ease, opacity 0.5s ease;
+
+  &.enabled {
+    opacity: 1;
+    transform: rotate(360deg);
+  }
 }
 
 .icons-bar {
@@ -35,12 +50,17 @@ body {
   flex-direction: row;
 }
 
-.random-icon {
+.random-icon,
+.lock-icon,
+.click-through-icon {
   margin-top: 4px;
-  margin-left: 8px;
+  margin-left: 5px;
   width: 32px;
   height: 32px;
+}
 
+.random-icon {
+  margin-left: 8px;
   &.disabled {
     content: url("../assets/random-onFocus.png");
 
@@ -59,11 +79,6 @@ body {
 }
 
 .lock-icon {
-  margin-top: 4px;
-  margin-left: 6px;
-  width: 32px;
-  height: 32px;
-
   &.disabled {
     content: url("../assets/lock-locked.png");
 
@@ -82,16 +97,19 @@ body {
 }
 
 .click-through-icon {
-  margin-top: 4px;
-  margin-left: 6px;
-  width: 32px;
-  height: 32px;
-
   &.disabled {
     content: url("../assets/click_through.png");
+
+    &:hover {
+      content: url("../assets/click_through-onFocus.png");
+    }
   }
 
   &.enabled {
     content: url("../assets/click_through-enabled.png");
+
+    &:hover {
+      content: url("../assets/click_through-onFocus-enabled.png.png");
+    }
   }
 }
