@@ -38,7 +38,7 @@ export default function App() {
                  draggable={false}
                  onContextMenu={(e)=>{e.preventDefault()}}
             >
-                {time}
+                <span>{time}</span>
             </div>
         </>
     )
