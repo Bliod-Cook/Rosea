@@ -1,10 +1,16 @@
-div {
+#main-div {
     font-size: 31px;
     line-height: 1.2;
     user-select: none;
     margin: auto;
     width: 100%;
     height: 100vh;
+    background-color: rgba(255, 255, 255, 80%);
+
+    &.enabled {
+        opacity: 0.3;
+        background-color: rgba(255, 255, 255, 0%)
+    }
 }
 
 body {
