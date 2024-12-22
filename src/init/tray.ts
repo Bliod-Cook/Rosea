@@ -15,6 +15,7 @@ const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
 export let moveable = false;
 export let click_through = false;
 export let manual_update_check = false;
+export let write = 1;
 
 export async function initTray() {
     await changeTray()
@@ -73,12 +74,12 @@ listen("change-lock",()=>{
 }).then()
 
 listen("change-click_through",()=>{
-    click_through = !click_through; emit("change_click_through").then(()=>{changeTray()})
+    click_through = !click_through; emit("change_click_through").then(()=>{changeTray().then()})
 }).then()
 
-export function getMovable() {
-    return moveable
-}
+listen("change-write",(e)=>{
+    write = <number>e.payload; emit("fresh-write-mode").then(()=>{changeTray().then()})
+}).then()
 
 function quit() {
     invoke("quit").then()

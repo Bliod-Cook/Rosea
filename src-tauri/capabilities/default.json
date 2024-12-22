@@ -7,7 +7,8 @@
     "random",
     "random/settings",
     "update",
-    "menu"
+    "menu",
+    "canvas"
   ],
   "permissions": [
     "core:default",
@@ -25,6 +26,7 @@
     "core:window:allow-set-position",
     "core:window:allow-set-size",
     "core:window:allow-get-all-windows",
+    "core:window:allow-current-monitor",
     "core:app:allow-default-window-icon",
     "fs:default",
     "fs:allow-applocaldata-write",

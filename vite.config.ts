@@ -35,7 +35,8 @@ export default defineConfig({
         randomer: resolve(__dirname, 'src/randomer/index.html'),
         randomerSettings: resolve(__dirname, 'src/randomer/settings/index.html'),
         update: resolve(__dirname, 'src/update/index.html'),
-        menu: resolve(__dirname, 'src/menu/index.html')
+        menu: resolve(__dirname, 'src/menu/index.html'),
+        canvas: resolve(__dirname, 'src/canvas/index.html')
       },
     },
   },

@@ -1,10 +1,16 @@
-div {
+#main-div {
     font-size: 31px;
     line-height: 1.2;
     user-select: none;
-    margin: auto;
-    width: 100%;
+    width: 100vmax;
     height: 100vh;
+    display: flex;
+    background-color: rgba(255, 255, 255, 80%);
+
+    &.enabled {
+        opacity: 0.3;
+        background-color: rgba(255, 255, 255, 0%)
+    }
 }
 
 body {
@@ -13,8 +19,17 @@ body {
     width: 100%;
     display: flex;
     padding: 0;
+    margin: 0;
 }
 
 .tauri-drag {
     app-region: drag;
+}
+
+span {
+    display: flex;
+    //margin-top: 7.4px;
+    //margin-left: 6px;
+    margin-inline: auto;
+    margin-top: 9px;
 }

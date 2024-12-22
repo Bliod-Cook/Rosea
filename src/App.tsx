@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
-import {moveable as gMoveable, click_through as gClickThrough} from "./init/tray.ts";
+import {click_through as gClickThrough, moveable as gMoveable} from "./init/tray.ts";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -10,28 +10,35 @@ export default function App() {
     }, 1000)
 
     const [moveable, setMoveable] = useState(false)
+    const [canClickThrough, setCanClickThrough] = useState(false)
 
     function changeMoveable() {
         setMoveable(gMoveable);
     }
 
+    function changeClickThrough() {
+        setCanClickThrough(gClickThrough)
+    }
+
     useEffect(() => {
-        getCurrentWindow().listen("change_moveable", () => {
+        const window = getCurrentWindow();
+        window.listen("change_moveable", () => {
             changeMoveable()
         }).then()
-        getCurrentWindow().listen("change_click_through", () => {
-            gClickThrough ? getCurrentWindow().setIgnoreCursorEvents(true) : getCurrentWindow().setIgnoreCursorEvents(false)
+        window.listen("change_click_through", () => {
+            gClickThrough ? getCurrentWindow().setIgnoreCursorEvents(true) : getCurrentWindow().setIgnoreCursorEvents(false);
+            changeClickThrough()
         }).then()
     });
 
     return (
         <>
             <div id={"main-div"}
-                 className={`${moveable?"tauri-drag":undefined}`}
+                 className={`${moveable?"tauri-drag":undefined} ${canClickThrough ? "enabled" : undefined}`}
                  draggable={false}
                  onContextMenu={(e)=>{e.preventDefault()}}
             >
-                {time}
+                <span>{time}</span>
             </div>
         </>
     )
