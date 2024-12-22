@@ -13,7 +13,11 @@
     "changelog": "node scripts/changelog.mjs"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@ltd/j-toml": "^1.38.0",
+    "@mui/icons-material": "^6.2.1",
+    "@mui/material": "^6.2.1",
     "@tauri-apps/api": "^2.1.1",
     "@tauri-apps/plugin-fs": "~2.2.0",
     "@tauri-apps/plugin-notification": "~2.2.0",

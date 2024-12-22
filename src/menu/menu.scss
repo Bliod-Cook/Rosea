@@ -14,16 +14,25 @@ body {
 .main {
   border-radius: 20px;
   width: 40px;
-  height: 100vh;
+  height: 40px;
   display: flex;
+  flex-direction: column;
   background-color: rgba(0,0,0,30%);
   overflow: hidden;
 
-  transition: width 0.5s ease;
+  transition: width 0.5s ease, height 0.5s ease;
 
-  &.enabled {
-    width: 100%;
+  &.opened {
+    width: 100vmax;
   }
+
+  &.second-opened {
+    height: 100vh;
+  }
+}
+
+.top-bar {
+  display: flex;
 }
 
 .menu-icon {
@@ -50,6 +59,9 @@ body {
   flex-direction: row;
 }
 
+.cursor-icon,
+.write-icon,
+.eraser-icon,
 .random-icon,
 .lock-icon,
 .click-through-icon {
@@ -59,13 +71,68 @@ body {
   height: 32px;
 }
 
-.random-icon {
+.cursor-icon {
   margin-left: 8px;
+
   &.disabled {
-    content: url("../assets/random-onFocus.png");
+    content: url("../assets/cursor.png");
 
     &:hover {
-      content: url("../assets/random.png");
+      content: url("../assets/cursor-onFocus.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/cursor-enabled.png");
+
+    &:hover {
+      content: url("../assets/cursor-onFocus-enabled.png");
+    }
+  }
+}
+
+.write-icon {
+  &.disabled {
+    content: url("../assets/write.png");
+
+    &:hover {
+      content: url("../assets/write-onFocus.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/write-enabled.png");
+
+    &:hover {
+      content: url("../assets/write-onFocus-enabled.png");
+    }
+  }
+}
+
+.eraser-icon {
+  &.disabled {
+    content: url("../assets/eraser.png");
+
+    &:hover {
+      content: url("../assets/eraser-onFocus.png");
+    }
+  }
+
+  &.enabled {
+    content: url("../assets/eraser-enabled.png");
+
+    &:hover {
+      content: url("../assets/eraser-onFocus-enabled.png");
+    }
+  }
+}
+
+.random-icon {
+  &.disabled {
+    content: url("../assets/random.png");
+
+    &:hover {
+      content: url("../assets/random-onFocus.png");
     }
   }
 
@@ -109,7 +176,7 @@ body {
     content: url("../assets/click_through-enabled.png");
 
     &:hover {
-      content: url("../assets/click_through-onFocus-enabled.png.png");
+      content: url("../assets/click_through-onFocus-enabled.png");
     }
   }
 }

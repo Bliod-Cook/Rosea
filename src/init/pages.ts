@@ -1,9 +1,11 @@
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 
 export function initPage() {
-    new TauriWebviewWindow("menu", {
-        url: "/menu/",
-        title: "Menu",
+    new TauriWebviewWindow("canvas", {
+        url: "/canvas/",
+        title: "Canvas",
+        x: 0,
+        y: 0,
         width: 40,
         height: 40,
         transparent: true,
@@ -14,8 +16,28 @@ export function initPage() {
         skipTaskbar: true,
         visible: true,
         zoomHotkeysEnabled: false,
-        maximizable: false
+        maximizable: true,
+        minimizable: false,
     })
+
+    setTimeout(()=> {
+        new TauriWebviewWindow("menu", {
+            parent: "canvas",
+            url: "/menu/",
+            title: "Menu",
+            width: 40,
+            height: 40,
+            transparent: true,
+            alwaysOnTop: true,
+            decorations: false,
+            shadow: false,
+            resizable: false,
+            skipTaskbar: true,
+            visible: true,
+            zoomHotkeysEnabled: false,
+            maximizable: false
+        })
+    },2000)
 
     new TauriWebviewWindow("random", {
         url: "/randomer/",
