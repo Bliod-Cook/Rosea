@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {click_through as gClickThrough, moveable as gMoveable} from "./init/tray.ts";
+import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -20,15 +21,24 @@ export default function App() {
         setCanClickThrough(gClickThrough)
     }
 
+    function moveToTopLeft() {
+        moveWindow(Position.TopLeft).then()
+    }
+
     useEffect(() => {
         const window = getCurrentWindow();
         window.listen("change_moveable", () => {
             changeMoveable()
         }).then()
         window.listen("change_click_through", () => {
-            gClickThrough ? getCurrentWindow().setIgnoreCursorEvents(true) : getCurrentWindow().setIgnoreCursorEvents(false);
+            if (gClickThrough) {
+                getCurrentWindow().setIgnoreCursorEvents(true).then();
+            } else {
+                getCurrentWindow().setIgnoreCursorEvents(false).then();
+            }
             changeClickThrough()
         }).then()
+        window.listen("move-top-left", moveToTopLeft).then()
     });
 
     return (
