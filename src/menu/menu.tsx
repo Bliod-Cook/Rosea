@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {getCurrentWindow, LogicalSize, PhysicalPosition} from "@tauri-apps/api/window";
 import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {click_through, moveable, write as gWrite} from "../init/tray.ts";
-import {emit} from "@tauri-apps/api/event";
+import {emit, emitTo} from "@tauri-apps/api/event";
 import PenSettings from "./components/pen/pen.tsx";
 import EraserSettings from "./components/eraser/earser.tsx";
 export default function Menu() {
@@ -69,8 +69,9 @@ export default function Menu() {
                             setWrite(gWrite)
                         })
                     }
-                }
-                }></div>
+                }}
+                     onAuxClick={()=>{emitTo("canvas","clear-eraserSize").then()}}
+                ></div>
                 <div className={`eraser-icon ${write === 3 ? "enabled" : "disabled"}`} onClick={() => {
                     if (write === 3) {
                         openSecondLayer().then()
@@ -99,7 +100,9 @@ export default function Menu() {
                     emit("change-lock").then(() => {
                         setLocked(!moveable)
                     })
-                }}></div>
+                }}
+                     onAuxClick={() => {emitTo("main","move-top-left").then()}}
+                ></div>
                 <div className={`click-through-icon ${canClickThrough ? "enabled" : "disabled"}`} onClick={() => {
                     emit("change-click_through").then(() => {
                         setCanClickThrough(click_through)
