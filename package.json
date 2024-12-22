@@ -26,6 +26,7 @@
     "@types/chance": "^1.1.6",
     "@vitejs/plugin-legacy": "^6.0.0",
     "chance": "^1.1.12",
+    "konva": "^9.3.16",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "terser": "^5.37.0",

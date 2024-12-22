@@ -7,7 +7,7 @@ export default function EraserSettings() {
     const [eraserList, setEraserList] = useState(new Array(3).fill(false))
 
     function enableEraser(eraser: number) {
-        const eraserNumberList = [[40,80], [60,120], [80, 160]]
+        const eraserNumberList = [30, 60, 100]
         emitTo("canvas", "change-eraserSize", eraserNumberList[eraser]).then()
         const list = new Array(3).fill(false)
         list[eraser] = true
