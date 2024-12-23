@@ -30,11 +30,13 @@ export default function App() {
         window.listen("change_moveable", () => {
             changeMoveable()
         }).then()
-        window.listen("change_click_through", () => {
+        window.listen("change-clickThrough", () => {
             if (gClickThrough) {
-                getCurrentWindow().setIgnoreCursorEvents(true).then();
+                // getCurrentWindow().setIgnoreCursorEvents(true).then();
+                window.hide().then();
             } else {
-                getCurrentWindow().setIgnoreCursorEvents(false).then();
+                // getCurrentWindow().setIgnoreCursorEvents(false).then();
+                window.show().then()
             }
             changeClickThrough()
         }).then()

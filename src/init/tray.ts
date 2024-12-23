@@ -2,7 +2,7 @@ import { TrayIcon } from "@tauri-apps/api/tray";
 import {defaultWindowIcon} from "@tauri-apps/api/app";
 import {Menu} from "@tauri-apps/api/menu";
 import {invoke} from "@tauri-apps/api/core";
-import {emit, listen} from "@tauri-apps/api/event";
+import {emitTo, listen} from "@tauri-apps/api/event";
 import { Update } from "./update.ts";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/plugin-notification";
 
@@ -27,12 +27,12 @@ async function changeTray()  {
             {
                 id: "moveable",
                 text: `Moveable ${moveable?"√":"×"}`,
-                action: () => {moveable = !moveable; emit("change_moveable").then(()=>{changeTray()})}
+                action: () => {moveable = !moveable; emitTo("main", "change_moveable").then(()=>{changeTray()})}
             },
             {
                 id: "click_through",
                 text: `ClickThrough ${click_through?"√":"×"}`,
-                action: () => {click_through = !click_through; emit("change_click_through").then(()=>{changeTray()})}
+                action: () => {click_through = !click_through; emitTo("main", "change-clickThrough").then(()=>{changeTray()})}
             },
             {
                 id: "check_update",
@@ -70,15 +70,15 @@ listen("newest-version", async () => {
 }).then()
 
 listen("change-lock",()=>{
-    moveable = !moveable; emit("change_moveable").then(()=>{changeTray().then()})
+    moveable = !moveable; emitTo("main","change_moveable").then(()=>{changeTray().then()})
 }).then()
 
 listen("change-click_through",()=>{
-    click_through = !click_through; emit("change_click_through").then(()=>{changeTray().then()})
+    click_through = !click_through; emitTo("main", "change-clickThrough").then(()=>{changeTray().then()})
 }).then()
 
 listen("change-write",(e)=>{
-    write = <number>e.payload; emit("fresh-write-mode").then(()=>{changeTray().then()})
+    write = <number>e.payload; emitTo("canvas","fresh-write-mode").then(()=>{changeTray().then()})
 }).then()
 
 function quit() {
