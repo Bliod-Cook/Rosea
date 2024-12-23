@@ -7,6 +7,10 @@ import {emit, emitTo} from "@tauri-apps/api/event";
 import PenSettings from "./components/pen/pen.tsx";
 import EraserSettings from "./components/eraser/earser.tsx";
 export default function Menu() {
+    const [sizeDefault] = useState(new LogicalSize(40, 40))
+    const [sizeFirst] = useState(new LogicalSize(275, 40))
+    const [sizeSecond] = useState(new LogicalSize(275, 160))
+
     const [open, setOpen] = useState(false)
     const [secondOpen, setSecondOpen] = useState(false)
 
@@ -19,32 +23,30 @@ export default function Menu() {
 
     useEffect(() => {
         getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()
-        getCurrentWindow().setSize(new LogicalSize(40, 40)).then()
-    }, []);
+        getCurrentWindow().setSize(sizeDefault).then()
+    }, [sizeDefault]);
 
     async function changeOpen() {
         const window = getCurrentWindow();
         if (!open) {
-            await window.setSize(new LogicalSize(275, 40))
+            await window.setSize(sizeSecond)
             setOpen(!open)
         } else {
             setOpen(!open)
             setSecondOpen(false)
-            setTimeout(async ()=>{await window.setSize(new LogicalSize(40, 40))}, 500)
+            setTimeout(async ()=>{await window.setSize(sizeDefault)}, 500)
         }
     }
 
     async function closeSecondLayer() {
         const window = getCurrentWindow();
-        const size = await window.innerSize()
         setSecondOpen(false)
-        setTimeout(async () => {await window.setSize(new LogicalSize(size.width, 40))}, 500)
+        setTimeout(async () => {await window.setSize(sizeFirst)}, 500)
     }
 
     async function openSecondLayer() {
         const window = getCurrentWindow();
-        const size = await window.innerSize()
-        await window.setSize(new LogicalSize(size.width, 160))
+        await window.setSize(sizeSecond)
         setSecondOpen(true)
     }
 
@@ -70,7 +72,6 @@ export default function Menu() {
                         })
                     }
                 }}
-                     onAuxClick={()=>{emitTo("canvas","clear-eraserSize").then()}}
                 ></div>
                 <div className={`eraser-icon ${write === 3 ? "enabled" : "disabled"}`} onClick={() => {
                     if (write === 3) {
@@ -80,7 +81,9 @@ export default function Menu() {
                             setWrite(gWrite)
                         })
                     }
-                }}></div>
+                }}
+                     onContextMenu={()=>{emitTo("canvas","clear-eraserSize").then()}}
+                ></div>
                 <div className={`random-icon ${randomPageOpened ? "enabled" : "disabled"}`} onClick={async () => {
                     const window = await WebviewWindow.getByLabel("random")
                     if (window) {
@@ -101,7 +104,7 @@ export default function Menu() {
                         setLocked(!moveable)
                     })
                 }}
-                     onAuxClick={() => {emitTo("main","move-top-left").then()}}
+                     onContextMenu={(e) => {e.preventDefault(); emitTo("main","move-top-left").then()}}
                 ></div>
                 <div className={`click-through-icon ${canClickThrough ? "enabled" : "disabled"}`} onClick={() => {
                     emit("change-click_through").then(() => {

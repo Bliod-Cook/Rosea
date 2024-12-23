@@ -25,7 +25,7 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
 
     return <>
         <div className={"slide-bar"}>
-            <Box width={150} marginX={"auto"} marginTop={"5px"}>
+            <Box width={150} marginX={"auto"} marginTop={"12px"}>
                 <Slider
                     marks={true}
                     min={1}
