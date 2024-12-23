@@ -19,7 +19,7 @@ export default function Menu() {
     const [canClickThrough, setCanClickThrough] = useState(click_through)
     const [write, setWrite] = useState(1);
 
-    const [lineWidth, setLineWidth] = useState(1)
+    const [lineWidth, setLineWidth] = useState(3)
 
     useEffect(() => {
         getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()

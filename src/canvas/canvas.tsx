@@ -18,8 +18,8 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     });
 
     useEffect(() => {
-        let lineWidth = 1;
-        let color = "#000"
+        let lineWidth = 3;
+        let color = "#d32f2f"
         let eraserSize = 30;
 
         let isErasing = false;

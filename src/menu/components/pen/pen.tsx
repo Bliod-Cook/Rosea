@@ -34,6 +34,7 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
                     valueLabelDisplay={"auto"}
                     onChange={changeWidth}
                     value={lineWidth}
+                    defaultValue={3}
                     color={"warning"}
                 ></Slider>
             </Box>
