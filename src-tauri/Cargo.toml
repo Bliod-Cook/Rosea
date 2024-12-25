@@ -25,6 +25,7 @@ tauri = { version = "2.0.6", features = ["tray-icon"] }
 tauri-plugin-log = "2.0.0-rc"
 tauri-plugin-fs = "2"
 tauri-plugin-notification = "2"
+tauri-plugin-devtools = "2.0.0"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-positioner = "2"

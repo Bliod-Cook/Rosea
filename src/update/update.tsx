@@ -38,10 +38,9 @@ export default function Update() {
                     })
                 }
                 await emit("newest-version")
-                getCurrentWindow().close().then()
-                // getCurrentWindow().show().then()
+                setTimeout(()=>{getCurrentWindow().close().then()}, 30000)
             })
-        } catch (e) {}
+        } catch (e) {console.log(e)}
         return 1
     })())
 

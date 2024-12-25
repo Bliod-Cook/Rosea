@@ -51,7 +51,9 @@ export default function Menu() {
     }
 
 
-    return <div className={`main ${open ? "opened":undefined} ${secondOpen ? "second-opened": undefined}`} onContextMenu={(e)=>{e.preventDefault()}}>
+    return <div className={`main ${open ? "opened":undefined} ${secondOpen ? "second-opened": undefined}`}
+                onContextMenu={(e)=>{e.preventDefault()}}
+    >
         <div className={"top-bar"}>
             <div className={`menu-icon ${open ? "enabled" : "disabled"}`} onClick={changeOpen}></div>
             <div className={"icons-bar"}>
