@@ -18,11 +18,16 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     });
 
     useEffect(() => {
-        let lineWidth = 1;
-        let color = "#000"
-        let eraserSize = 30;
+        let lineWidth = 3;
+        let color = "#d32f2f"
+        let eraserSize = 60;
 
         let isErasing = false;
+
+
+        let isPaint = false;
+        let lastLine: Konva.Line;
+
 
         const window = getCurrentWindow()
 
@@ -30,15 +35,12 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
             window.setIgnoreCursorEvents((gWrite === 1)).then()
             isErasing = gWrite === 3;
         }).then()
-
         window.listen("change-lineWidth", (e)=>{
             lineWidth = e.payload as number
         }).then()
-
         window.listen("change-penColor", (e)=> {
             color = e.payload as string
         }).then()
-
         window.listen("change-eraserSize", (e)=>{
             eraserSize = e.payload as number
         }).then()
@@ -56,9 +58,6 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
         stage.add(layer)
 
-        let isPaint = false;
-        let lastLine: Konva.Line;
-
         window.listen("clear-eraserSize", ()=>{
             layer.destroy()
             layer = new Konva.Layer
@@ -66,21 +65,16 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
         }).then()
 
         stage.on("mousedown touchstart", () => {
-            console.log(isErasing, color, lineWidth)
-            let TColor = color;
-            if (TColor === "") {
-                TColor = "#000"
-            }
             isPaint = true;
             const pos = stage.getPointerPosition();
             if (pos) {
                 lastLine = new Konva.Line({
-                    stroke: TColor,
+                    stroke: color,
                     strokeWidth: !isErasing ? lineWidth : eraserSize,
                     globalCompositeOperation: !isErasing ? 'source-over' : 'destination-out',
                     lineCap: 'round',
                     lineJoin: 'round',
-                    points: [pos.x, pos.y, pos.x, pos.y]
+                    points: [pos.x, pos.y, pos.x, pos.y],
                 })
                 layer.add(lastLine)
             }
@@ -106,33 +100,6 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     });
 
     return <>
-        {/*<canvas id={"canvas"} onMouseMove={(e) => {*/}
-        {/*    if (e.buttons) {*/}
-        {/*        const {screenX, screenY} = e;*/}
-        {/*        const {movementX, movementY} = e;*/}
-        {/*        const ctx = e.currentTarget.getContext("2d")*/}
-
-        {/*        if (ctx) {*/}
-        {/*            if (isErasing) {*/}
-        {/*                ctx.fillStyle = "rgb(255,255,255)"*/}
-        {/*                ctx.fillRect(screenX-eraserSize[0]/2, screenY-eraserSize[1]/2, eraserSize[0], eraserSize[1])*/}
-        {/*                setTimeout(()=>{ctx.clearRect(screenX-eraserSize[0]/2, screenY-eraserSize[1]/2, eraserSize[0], eraserSize[1]); ctx.restore()}, 50)*/}
-        {/*            } else {*/}
-        {/*                ctx.lineWidth = lineWidth;*/}
-        {/*                ctx.strokeStyle = color*/}
-        {/*                console.log(ctx.fillStyle)*/}
-        {/*                // ctx.fillRect(screenX, screenY, 4, 4)*/}
-        {/*                ctx.beginPath()*/}
-        {/*                ctx.moveTo(screenX-movementX, screenY-movementY)*/}
-        {/*                ctx.lineTo(screenX, screenY)*/}
-        {/*                ctx.stroke()*/}
-        {/*            }*/}
-        {/*        }*/}
-        {/*    }*/}
-        {/*}}*/}
-        {/*        width={screenSize.width}*/}
-        {/*        height={screenSize.height}*/}
-        {/*></canvas>*/}
         <div id={"container"}></div>
     </>
 }

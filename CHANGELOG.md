@@ -1,3 +1,16 @@
+## 0.1.7
+
+Chore:
+1. Custom Menu Icon
+
+Fix:
+1. Fix 1 lag problem
+
+Feat:
+1. Now red pen and 3 width is default
+
+---
+
 ## 0.1.6
 
 #### Fix
