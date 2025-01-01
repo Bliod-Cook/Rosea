@@ -6,6 +6,10 @@ import {click_through, moveable, write as gWrite} from "../init/tray.ts";
 import {emit, emitTo} from "@tauri-apps/api/event";
 import PenSettings from "./components/pen/pen.tsx";
 import EraserSettings from "./components/eraser/earser.tsx";
+import DefaultIcon from "../assets/icon.svg"
+import {exists, BaseDirectory, readFile} from '@tauri-apps/plugin-fs';
+import { Buffer } from 'buffer'
+
 export default function Menu() {
     const [sizeDefault] = useState(new LogicalSize(40, 40))
     const [sizeFirst] = useState(new LogicalSize(275, 40))
@@ -20,6 +24,20 @@ export default function Menu() {
     const [write, setWrite] = useState(1);
 
     const [lineWidth, setLineWidth] = useState(3)
+
+    const [menuIcon, setMenuIcon] = useState(DefaultIcon)
+    const [customizedMenuIcon, setCustomizedMenuIcon] = useState(false)
+
+    useEffect(() => {
+        exists('menu.png', {baseDir: BaseDirectory.AppLocalData})
+            .then(async (e)=>{
+                if (e) {
+                    const customizedMenuIcon = await readFile('menu.png', {baseDir: BaseDirectory.AppLocalData})
+                    setMenuIcon(`data:image/jpg;base64,${Buffer.from(customizedMenuIcon).toString('base64')}`)
+                    setCustomizedMenuIcon(true)
+                }
+            })
+    }, []);
 
     useEffect(() => {
         getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()
@@ -51,11 +69,15 @@ export default function Menu() {
     }
 
 
-    return <div className={`main ${open ? "opened":undefined} ${secondOpen ? "second-opened": undefined}`}
+    return <div className={`main ${open ? "opened": ""} ${secondOpen ? "second-opened": ""}`}
                 onContextMenu={(e)=>{e.preventDefault()}}
     >
         <div className={"top-bar"}>
-            <div className={`menu-icon ${open ? "enabled" : "disabled"}`} onClick={changeOpen}></div>
+            <div className={`menu-icon ${open ? "enabled" : "disabled"} ${customizedMenuIcon ? "customizedMenuIcon": ""}`} onClick={changeOpen}
+                 style={{
+                     content: `url(${menuIcon})`,
+                 }}
+            ></div>
             <div className={"icons-bar"}>
                 <div className={`cursor-icon ${write === 1 ? "enabled" : "disabled"}`} onClick={() => {
                     if ((write === 2) || (write === 3)) {

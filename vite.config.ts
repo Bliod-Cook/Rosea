@@ -55,6 +55,6 @@ export default defineConfig({
         renderLegacyChunks: false,
         modernTargets: ["edge>=109", "safari>=13"],
         modernPolyfills: true,
-      })
+      }),
   ]
 });
