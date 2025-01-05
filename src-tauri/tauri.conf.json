@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "rosea",
-        "width": 110,
-        "height": 18,
+        "width": 136,
+        "height": 52,
         "resizable": false,
         "fullscreen": false,
         "decorations": false,

@@ -4,6 +4,7 @@ import TOML from "@ltd/j-toml"
 import {useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
+import {Box, Button} from "@mui/material";
 
 export default function RandomSettingsPage() {
     const [input1, setInput1] = useState("");
@@ -29,7 +30,7 @@ export default function RandomSettingsPage() {
         configData["random_max"] = String(Number(input2))
         await writeTextFile(
             'config.toml',
-            // @ts-ignore
+            // @ts-expect-error Its Work
             TOML.stringify(configData),
             {baseDir: BaseDirectory.AppLocalData}
         )
@@ -60,8 +61,8 @@ export default function RandomSettingsPage() {
             </div>
         </div>
         <div id={"buttons"}>
-            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "primary"} no-drag-region`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
-            <button className={"app-btn no-drag-region"} onClick={closeWindow}>取消</button>
+            <Box><Button variant={"contained"} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save} color={"success"}>保存</Button></Box>
+            <Box><Button variant={"contained"} onClick={closeWindow} color={"inherit"}>取消</Button></Box>
         </div>
     </div>
 }

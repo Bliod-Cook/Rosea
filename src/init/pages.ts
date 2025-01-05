@@ -59,7 +59,7 @@ export function initPage() {
         url: "/randomer/settings/",
         title: "设置",
         width: 320,
-        height: 220,
+        height: 230,
         transparent: true,
         alwaysOnTop: true,
         decorations: false,
