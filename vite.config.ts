@@ -37,11 +37,19 @@ export default defineConfig({
         canvas: resolve(__dirname, 'src/canvas/index.html')
       },
     },
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src')
     }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler",
+      },
+    },
   },
   root: "src",
   define: {
