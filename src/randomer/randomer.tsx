@@ -1,10 +1,10 @@
 import "../assets/global.scss"
-import "./randomer.scss"
+import RandomerStyle from "./randomer.module.scss"
 import {useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {BaseDirectory, create, exists, readTextFile} from "@tauri-apps/plugin-fs";
 import TOML from "@ltd/j-toml";
-import {Box, LinearProgress} from "@mui/material";
+import {Box, Button, LinearProgress} from "@mui/material";
 
 export default function RandomPage() {
     const [randomNumber, setRandomNumber] = useState(0)
@@ -44,14 +44,14 @@ export default function RandomPage() {
 
     return (
         <>
-            <div className={"background drag-region"}
+            <Box className={`${RandomerStyle.background} drag-region`}
                  onScroll={(e) => {
                      e.preventDefault()
                  }}
             >
-                <div id={"print"} className={"unselect"}>
-                    <div id={"number"}>{randomNumber}</div>
-                </div>
+                <Box unselectable={"on"} textAlign={"center"} height={"30px"}>
+                    <Box marginTop={"20px"}>{randomNumber}</Box>
+                </Box>
                 <Box
                     width={80}
                     marginX={"auto"}
@@ -64,14 +64,16 @@ export default function RandomPage() {
                 <Box
                     marginTop={"20px"}
                 >
-                    <div id={"buttons"} className={"unselect"}>
-                        <button onClick={random} className={"win10-button no-drag-region"}>抽取</button>
-                        <button onClick={changeRandomSettingsPageVisibility}
-                                className={"win10-button no-drag-region"}>设置
-                        </button>
-                    </div>
+                    <Box unselectable={"on"} className={`${RandomerStyle.buttons}`} marginX={"auto"}>
+                        <Button onClick={random} className={`${RandomerStyle.win10Button} no-drag-region`}>抽取</Button>
+                        <Button onClick={changeRandomSettingsPageVisibility}
+                                className={`${RandomerStyle.win10Button} no-drag-region`}
+                        >
+                            设置
+                        </Button>
+                    </Box>
                 </Box>
-            </div>
+            </Box>
         </>
     )
 }
