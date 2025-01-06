@@ -1,3 +1,15 @@
+## 0.1.8
+
+Chore:
+1. update dependencies
+2. minify app
+3. remove win11-ui
+
+Fix:
+1. fix update page
+
+---
+
 ## 0.1.7
 
 Chore:
