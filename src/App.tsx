@@ -3,6 +3,7 @@ import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {click_through as gClickThrough, moveable as gMoveable} from "./init/tray.ts";
 import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
+import {Box} from "@mui/material";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
@@ -11,14 +12,9 @@ export default function App() {
     }, 1000)
 
     const [moveable, setMoveable] = useState(false)
-    const [canClickThrough, setCanClickThrough] = useState(false)
 
     function changeMoveable() {
         setMoveable(gMoveable);
-    }
-
-    function changeClickThrough() {
-        setCanClickThrough(gClickThrough)
     }
 
     function moveToTopLeft() {
@@ -32,13 +28,10 @@ export default function App() {
         }).then()
         window.listen("change-clickThrough", () => {
             if (gClickThrough) {
-                // getCurrentWindow().setIgnoreCursorEvents(true).then();
                 window.hide().then();
             } else {
-                // getCurrentWindow().setIgnoreCursorEvents(false).then();
                 window.show().then()
             }
-            changeClickThrough()
         }).then()
         window.listen("move-top-left", moveToTopLeft).then()
     });
@@ -46,11 +39,14 @@ export default function App() {
     return (
         <>
             <div id={"main-div"}
-                 className={`${moveable?"tauri-drag":undefined} ${canClickThrough ? "enabled" : undefined}`}
+                 className={`${moveable?"tauri-drag":undefined}`}
                  draggable={false}
                  onContextMenu={(e)=>{e.preventDefault()}}
             >
-                <span>{time}</span>
+                <Box
+                    marginX={"auto"}
+                    marginY={"auto"}
+                ><span>{time}</span></Box>
             </div>
         </>
     )

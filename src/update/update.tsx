@@ -4,6 +4,7 @@ import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {moveWindow, Position} from '@tauri-apps/plugin-positioner';
 import {emit} from "@tauri-apps/api/event";
+import {Box, LinearProgress} from "@mui/material";
 
 export default function Update() {
     const [isStart, setIsStart] = useState(false)
@@ -44,20 +45,8 @@ export default function Update() {
         return 1
     })())
 
-    return <div className={"root-div"}>
-        <h1 className="app-m-0">{isStart ? (((downloaded/contentLength)*100).toFixed(1) + "%") : "wait"}</h1>
-        <div className="app-progress-container">
-            <div className="app-progress-content">
-                <div className="app-progress-bar">
-                    <span
-                        role="progressbar"
-                        style={{
-                            width: isStart ? ((downloaded/contentLength)*200) : 200
-                        }}
-                        className={isStart ? "" : "indeterminate"}
-                    ></span>
-                </div>
-            </div>
-        </div>
-    </div>
+    return <Box className={"root-div"} display={"flex"} flexDirection={"column"}>
+        <Box marginX={"auto"}><h1>{isStart ? (((downloaded / contentLength) * 100).toFixed(1) + "%") : "wait"}</h1></Box>
+        <Box marginX={"auto"} width={"250px"}><LinearProgress value={isStart ? (downloaded/contentLength) : undefined} variant={isStart ? "determinate" : undefined}></LinearProgress></Box>
+    </Box>
 }

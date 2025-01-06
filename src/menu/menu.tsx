@@ -9,6 +9,7 @@ import EraserSettings from "./components/eraser/earser.tsx";
 import DefaultIcon from "../assets/icon.svg"
 import {exists, BaseDirectory, readFile} from '@tauri-apps/plugin-fs';
 import { Buffer } from 'buffer'
+import {Box} from "@mui/material";
 
 export default function Menu() {
     const [sizeDefault] = useState(new LogicalSize(40, 40))
@@ -73,11 +74,15 @@ export default function Menu() {
                 onContextMenu={(e)=>{e.preventDefault()}}
     >
         <div className={"top-bar"}>
-            <div className={`menu-icon ${open ? "enabled" : "disabled"} ${customizedMenuIcon ? "customizedMenuIcon": ""}`} onClick={changeOpen}
-                 style={{
-                     content: `url(${menuIcon})`,
-                 }}
-            ></div>
+            <Box>
+                <div
+                    className={`menu-icon ${open ? "enabled" : "disabled"} ${customizedMenuIcon ? "customizedMenuIcon" : ""}`}
+                    onClick={changeOpen}
+                    style={{
+                        content: `url(${menuIcon})`,
+                    }}
+                ></div>
+            </Box>
             <div className={"icons-bar"}>
                 <div className={`cursor-icon ${write === 1 ? "enabled" : "disabled"}`} onClick={() => {
                     if ((write === 2) || (write === 3)) {
@@ -89,7 +94,11 @@ export default function Menu() {
                 }}></div>
                 <div className={`write-icon ${write === 2 ? "enabled" : "disabled"}`} onClick={() => {
                     if (write === 2) {
-                        openSecondLayer().then()
+                        if (secondOpen) {
+                            closeSecondLayer().then()
+                        } else {
+                            openSecondLayer().then()
+                        }
                     } else {
                         emit("change-write", 2).then(() => {
                             setWrite(gWrite)
@@ -99,7 +108,11 @@ export default function Menu() {
                 ></div>
                 <div className={`eraser-icon ${write === 3 ? "enabled" : "disabled"}`} onClick={() => {
                     if (write === 3) {
-                        openSecondLayer().then()
+                        if (secondOpen) {
+                            closeSecondLayer().then()
+                        } else {
+                            openSecondLayer().then()
+                        }
                     } else {
                         emit("change-write", 3).then(() => {
                             setWrite(gWrite)

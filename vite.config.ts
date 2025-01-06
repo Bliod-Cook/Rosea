@@ -32,18 +32,24 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'src/index.html'),
-        randomer: resolve(__dirname, 'src/randomer/index.html'),
-        randomerSettings: resolve(__dirname, 'src/randomer/settings/index.html'),
         update: resolve(__dirname, 'src/update/index.html'),
         menu: resolve(__dirname, 'src/menu/index.html'),
         canvas: resolve(__dirname, 'src/canvas/index.html')
       },
     },
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src')
     }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler",
+      },
+    },
   },
   root: "src",
   define: {

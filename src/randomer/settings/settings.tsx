@@ -1,9 +1,10 @@
 import "../../assets/global.scss"
-import './settings.scss'
+import SettingsStyle from './settings.module.scss'
 import TOML from "@ltd/j-toml"
 import {useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
+import {Box, Button, TextField} from "@mui/material";
 
 export default function RandomSettingsPage() {
     const [input1, setInput1] = useState("");
@@ -29,41 +30,33 @@ export default function RandomSettingsPage() {
         configData["random_max"] = String(Number(input2))
         await writeTextFile(
             'config.toml',
-            // @ts-ignore
+            // @ts-expect-error Its Work
             TOML.stringify(configData),
             {baseDir: BaseDirectory.AppLocalData}
         )
         await getCurrentWindow().hide()
     }
 
-    return <div className={"background drag-region"} onScroll={(e) => {e.preventDefault()}}>
-        <div id={"InputBars"}>
-            <div className={"center"}>
-                <p className={"unselect"}>最小</p>
-                <div id={"InputMin"}
-                     className={`app-input-container no-drag-region ${isIllegal(input1) ? "input-danger" : "input-success"}`}>
-                    <input className={"app-input-text no-drag-region"} onChange={(c) => {setInput1(c.target.value)}} value={input1}/>
-                    <div className="app-input-end-content">
-                        <i className="icons10-status"></i>
-                    </div>
-                </div>
-            </div>
-            <div className={"center"}>
-                <p className={"unselect"}>最大</p>
-                <div id={"InputMax"}
-                     className={`app-input-container no-drag ${isIllegal(input2) ? "input-danger" : "input-success"}`}>
-                    <input className={"app-input-text no-drag"} onChange={(c) => {setInput2(c.target.value)}} value={input2}/>
-                    <div className="app-input-end-content">
-                        <i className="icons10-status"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id={"buttons"}>
-            <button className={`app-btn app-btn-${(isIllegal(input1) || isIllegal(input2) || input1 > input2) ? "" : "primary"} no-drag-region`} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save}>保存</button>
-            <button className={"app-btn no-drag-region"} onClick={closeWindow}>取消</button>
-        </div>
-    </div>
+    return <Box className={`${SettingsStyle.background} drag-region`} onScroll={(e) => {e.preventDefault()}}>
+        <Box className={`${SettingsStyle.InputBars} ${SettingsStyle.center}`}>
+            <Box id={"InputMin"}
+                 className={`no-drag-region`}
+                 marginTop={"40px"}
+            >
+                <TextField variant={"outlined"} color={"secondary"} label={"Min"} size={"small"} error={isIllegal(input1)} onChange={(c) => {setInput1(c.target.value)}} value={input1}></TextField>
+            </Box>
+            <Box id={"InputMax"}
+                 className={`no-drag-region`}
+                 marginTop={"20px"}
+            >
+                <TextField variant={"outlined"} color={"secondary"} label={"Min"} size={"small"} error={isIllegal(input2)} onChange={(c) => {setInput2(c.target.value)}} value={input2}></TextField>
+            </Box>
+        </Box>
+        <Box className={`${SettingsStyle.buttons}`} marginTop={"25px"}>
+            <Box><Button variant={"contained"} disabled={isIllegal(input1) || isIllegal(input2) || input1 > input2} onClick={save} color={"success"}>保存</Button></Box>
+            <Box><Button variant={"contained"} onClick={closeWindow} color={"inherit"}>取消</Button></Box>
+        </Box>
+    </Box>
 }
 
 function isIllegal(i: string): boolean {
