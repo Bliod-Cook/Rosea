@@ -1,7 +1,3 @@
-@import "windows-ui-fabric/dist/config/app-config.css";
-@import "windows-ui-fabric/dist/windows-ui.min.css";
-@import "windows-ui-fabric/dist/icons/winui-icons.min.css";
-
 .app-m-0 {
     text-align: center;
 }
@@ -22,4 +18,8 @@ span {
 
 body {
     overflow: hidden !important;
+}
+
+.h1 {
+    margin: auto;
 }
