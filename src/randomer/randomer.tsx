@@ -1,36 +1,53 @@
 import "../assets/global.scss"
 import RandomerStyle from "./randomer.module.scss"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {BaseDirectory, create, exists, readTextFile} from "@tauri-apps/plugin-fs";
 import TOML from "@ltd/j-toml";
 import {Box, Button, LinearProgress} from "@mui/material";
+import {getCurrentWindow} from "@tauri-apps/api/window";
+import { message } from '@tauri-apps/plugin-dialog';
+
+const chance = new (await import("chance")).Chance()
 
 export default function RandomPage() {
     const [randomNumber, setRandomNumber] = useState(0)
     const [max, setMax] = useState(0); const [min, setMin] = useState(0)
-    const [historyNumber, setHistoryNumber] = useState(Array<number | null>(20).fill(null))
+    const [history] = useState(new historyNumber())
 
-    async function random() {
-        const [minN, maxN]: [number, number] = await rNumber()
-        if (maxN === max && minN === min) { /* empty */ } else {
-            setHistoryNumber(Array<number | null>(20).fill(null))
-        }
-        const weightList: number[] = Array(maxN - minN + 1).fill(100)
-        historyNumber.forEach((e) => {
+    async function getRandomNumber() {
+        const weightList: number[] = Array(max - min + 1).fill(100)
+        history.list.forEach((e) => {
             if (e !== null) {
                 const i: number = Number(e);
-                weightList[i - minN] = 10
+                weightList[i - min] = 10
             }
         })
-        setMax(maxN); setMin(minN)
-        const random_number = (new (await import("chance")).Chance()).weighted(
-            Array.from(Array(maxN-minN+1), (_v,k) =>k+1),
+        const random_number = chance.weighted(
+            Array.from(Array(max-min+1), (_v,k) =>k+1),
             weightList
         )
-        historyNumber.pop()
-        historyNumber.unshift(random_number)
-        setRandomNumber(random_number)
+
+        console.log(weightList)
+
+        history.list.pop()
+        history.list.unshift(random_number)
+
+        return random_number
+    }
+
+    async function random() {
+        /*// DEBUG
+        console.log("DEBUG START")
+        // const chance = (new (await import("chance")).Chance())
+        const list = Array(48).fill(0);
+        for (let i = 1; i < 2000000; i++) {
+            list[await getRandomNumber()-1] += 1
+        }
+        console.log(list)
+        // DEBUG FINISHED*/
+
+        setRandomNumber(await getRandomNumber())
     }
 
     async function changeRandomSettingsPageVisibility() {
@@ -40,6 +57,28 @@ export default function RandomPage() {
         } else {
             await tWindow?.show()
         }
+    }
+
+    useEffect(() => {
+        setRange().then()
+        const window = getCurrentWindow();
+
+        window.listen('random-range-set', setRange).then()
+    });
+
+    async function setRange() {
+        const [minN, maxN]: [number, number] = await rNumber()
+        if (maxN === max && minN === min) { /* empty */ } else {
+            history.list = Array<number | null>(20).fill(null)
+        }
+        setMax(maxN); setMin(minN)
+    }
+
+    async function notify_reseted() {
+        await message(
+            'Weight Reseted',
+            { title: 'Tauri', kind: 'info' }
+        );
     }
 
     return (
@@ -53,19 +92,36 @@ export default function RandomPage() {
                     <Box marginTop={"20px"}>{randomNumber}</Box>
                 </Box>
                 <Box
-                    width={80}
+                    width={120}
                     marginX={"auto"}
+                    display={"flex"}
                 >
-                    <LinearProgress
+                    <Box className={`${RandomerStyle.smallFont}`} width={20} sx={{textAlign: "center"}}>{min}</Box>
+                    <Box
+                        width={80}
+                        marginX={"auto"}
+                        marginTop={"7px"}
+                    ><LinearProgress
                         variant={"determinate"}
                         value={randomNumber/(max-min)*98}
-                    ></LinearProgress>
+                    ></LinearProgress></Box>
+                    <Box className={`${RandomerStyle.smallFont}`} width={20} sx={{textAlign: "center"}}>{max}</Box>
                 </Box>
                 <Box
                     marginTop={"20px"}
                 >
                     <Box unselectable={"on"} className={`${RandomerStyle.buttons}`} marginX={"auto"}>
-                        <Button onClick={random} className={`${RandomerStyle.win10Button} no-drag-region`}>抽取</Button>
+                        <Button onClick={random} className={`${RandomerStyle.win10Button} no-drag-region`} onContextMenu={
+                            async (e) => {
+                                e.preventDefault()
+
+                                console.log("Reset")
+
+                                history.reset()
+
+                                await notify_reseted()
+                            }
+                        }>抽取</Button>
                         <Button onClick={changeRandomSettingsPageVisibility}
                                 className={`${RandomerStyle.win10Button} no-drag-region`}
                         >
@@ -89,4 +145,16 @@ async function rNumber(): Promise<[number, number]> {
     const maxN = Number(configData["random_max"] ?? 48)
     const minN = Number(configData["random_min"] ?? 1)
     return [minN, maxN]
+}
+
+class historyNumber {
+    public list: (number | null)[]
+
+    constructor() {
+        this.list = Array<number | null>(20).fill(null)
+    }
+
+    reset() {
+        this.list = Array<number | null>(20).fill(null)
+    }
 }
