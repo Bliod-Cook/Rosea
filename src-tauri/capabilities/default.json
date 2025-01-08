@@ -38,6 +38,7 @@
     "notification:allow-notify",
     "notification:allow-permission-state",
     "notification:allow-request-permission",
-    "positioner:default"
+    "positioner:default",
+    "dialog:default"
   ]
 }

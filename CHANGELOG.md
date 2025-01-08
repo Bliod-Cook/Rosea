@@ -1,3 +1,8 @@
+## 0.1.9
+
+Chore:
+1. Optimize UI
+
 ## 0.1.8
 
 Chore:

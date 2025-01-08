@@ -5,6 +5,7 @@ import {useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
 import {Box, Button, TextField} from "@mui/material";
+import {emitTo} from "@tauri-apps/api/event";
 
 export default function RandomSettingsPage() {
     const [input1, setInput1] = useState("");
@@ -34,6 +35,7 @@ export default function RandomSettingsPage() {
             TOML.stringify(configData),
             {baseDir: BaseDirectory.AppLocalData}
         )
+        emitTo('random', 'random-range-set').then()
         await getCurrentWindow().hide()
     }
 
