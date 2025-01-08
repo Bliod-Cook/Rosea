@@ -74,9 +74,9 @@ export default function RandomPage() {
         setMax(maxN); setMin(minN)
     }
 
-    async function notify_reseted() {
+    async function notify_reset() {
         await message(
-            'Weight Reseted',
+            'Weight Reset',
             { title: 'Tauri', kind: 'info' }
         );
     }
@@ -119,7 +119,7 @@ export default function RandomPage() {
 
                                 history.reset()
 
-                                await notify_reseted()
+                                await notify_reset()
                             }
                         }>抽取</Button>
                         <Button onClick={changeRandomSettingsPageVisibility}
