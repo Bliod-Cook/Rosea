@@ -20,7 +20,7 @@ export default function RandomPage() {
         history.list.forEach((e) => {
             if (e !== null) {
                 const i: number = Number(e);
-                weightList[i - min] = 10
+                weightList[i - min] = 5
             }
         })
         const random_number = chance.weighted(
@@ -69,7 +69,7 @@ export default function RandomPage() {
     async function setRange() {
         const [minN, maxN]: [number, number] = await rNumber()
         if (maxN === max && minN === min) { /* empty */ } else {
-            history.list = Array<number | null>(20).fill(null)
+            history.reset()
         }
         setMax(maxN); setMin(minN)
     }
@@ -124,6 +124,7 @@ export default function RandomPage() {
                         }>抽取</Button>
                         <Button onClick={changeRandomSettingsPageVisibility}
                                 className={`${RandomerStyle.win10Button} no-drag-region`}
+                                onContextMenu={(e)=>{e.preventDefault()}}
                         >
                             设置
                         </Button>
@@ -151,10 +152,10 @@ class historyNumber {
     public list: (number | null)[]
 
     constructor() {
-        this.list = Array<number | null>(20).fill(null)
+        this.list = Array<number | null>(30).fill(null)
     }
 
     reset() {
-        this.list = Array<number | null>(20).fill(null)
+        this.list = Array<number | null>(30).fill(null)
     }
 }
