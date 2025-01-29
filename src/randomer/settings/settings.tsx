@@ -51,7 +51,7 @@ export default function RandomSettingsPage() {
                  className={`no-drag-region`}
                  marginTop={"20px"}
             >
-                <TextField variant={"outlined"} color={"secondary"} label={"Min"} size={"small"} error={isIllegal(input2)} onChange={(c) => {setInput2(c.target.value)}} value={input2}></TextField>
+                <TextField variant={"outlined"} color={"secondary"} label={"Max"} size={"small"} error={isIllegal(input2)} onChange={(c) => {setInput2(c.target.value)}} value={input2}></TextField>
             </Box>
         </Box>
         <Box className={`${SettingsStyle.buttons}`} marginTop={"25px"}>
