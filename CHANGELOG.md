@@ -1,3 +1,14 @@
+# 0.1.11
+
+Feat:
+1. Auto close clich_through mode after 60s
+
+Chore:
+1. Update Deps
+2. Change 1 Deprecated Option
+
+---
+
 ## 0.1.10
 
 Feat:
