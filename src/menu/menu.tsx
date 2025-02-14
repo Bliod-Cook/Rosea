@@ -24,6 +24,8 @@ export default function Menu() {
     const [canClickThrough, setCanClickThrough] = useState(click_through)
     const [write, setWrite] = useState(1);
 
+    const [ctTimeoutId, setCtTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
     const [lineWidth, setLineWidth] = useState(3)
 
     const [menuIcon, setMenuIcon] = useState(DefaultIcon)
@@ -44,6 +46,14 @@ export default function Menu() {
         getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()
         getCurrentWindow().setSize(sizeDefault).then()
     }, [sizeDefault]);
+
+    useEffect(() => {
+        return () => {
+            if (ctTimeoutId) {
+                clearTimeout(ctTimeoutId);
+            }
+        };
+    }, [ctTimeoutId]);
 
     async function changeOpen() {
         const window = getCurrentWindow();
@@ -144,9 +154,28 @@ export default function Menu() {
                      onContextMenu={(e) => {e.preventDefault(); emitTo("main","move-top-left").then()}}
                 ></div>
                 <div className={`click-through-icon ${canClickThrough ? "enabled" : "disabled"}`} onClick={() => {
+                    // 切换前清除现有定时器
+                    if (ctTimeoutId) {
+                        clearTimeout(ctTimeoutId);
+                        setCtTimeoutId(null);
+                    }
+
                     emit("change-click_through").then(() => {
-                        setCanClickThrough(click_through)
-                    })
+                        const newState = !canClickThrough;
+                        setCanClickThrough(newState);
+
+                        // 如果开启状态，设置自动关闭定时器
+                        if (newState) {
+                            const timeoutId = setTimeout(() => {
+                                emit("change-click_through").then(() => {
+                                    setCanClickThrough(false);
+                                    setCtTimeoutId(null);
+                                });
+                            }, 60000);
+
+                            setCtTimeoutId(timeoutId);
+                        }
+                    });
                 }}></div>
             </div>
         </div>

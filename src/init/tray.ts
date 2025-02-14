@@ -7,7 +7,7 @@ import { Update } from "./update.ts";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/plugin-notification";
 
 const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
-    menuOnLeftClick: true,
+    showMenuOnLeftClick: true,
     icon: await defaultWindowIcon() ?? undefined,
     id: "default",
 })
