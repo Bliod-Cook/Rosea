@@ -42,7 +42,7 @@ export default function Update() {
                 setTimeout(()=>{getCurrentWindow().close().then()}, 30000)
             })
         } catch (e) {console.log(e)}
-    })
+    }, [])
 
     return <Box className={"root-div"} display={"flex"} flexDirection={"column"}>
         <Box marginX={"auto"}><h1>{isStart ? (((downloaded / contentLength) * 100).toFixed(1) + "%") : "wait"}</h1></Box>
