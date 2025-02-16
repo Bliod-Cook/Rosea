@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
-import {click_through as gClickThrough, moveable as gMoveable} from "./init/tray.ts";
+import {visibility as gClickThrough} from "./init/tray.ts";
 import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
 import {Box} from "@mui/material";
 
@@ -16,20 +16,26 @@ export default function App() {
 
     const [moveable, setMoveable] = useState(false)
 
-    function changeMoveable() {
-        setMoveable(gMoveable);
-        getCurrentWindow().setIgnoreCursorEvents(!gMoveable).then()
-    }
-
     function moveToTopLeft() {
         moveWindow(Position.TopLeft).then()
     }
 
     useEffect(() => {
         const window = getCurrentWindow();
-        window.listen("change_moveable", () => {
-            changeMoveable()
+        window.listen("change://clock/move-ability", (event) => {
+            setMoveable(event.payload as boolean)
         }).then()
+
+        window.listen("change://clock/visibility", (event) => {
+            if (event.payload as boolean) {
+                window.show().then()
+            } else {
+                window.hide().then()
+            }
+        }).then()
+
+        window.listen("reset://clock/position", moveToTopLeft).then()
+
         window.listen("change-clickThrough", () => {
             if (gClickThrough) {
                 window.hide().then();
@@ -37,7 +43,6 @@ export default function App() {
                 window.show().then()
             }
         }).then()
-        window.listen("move-top-left", moveToTopLeft).then()
     }, []);
 
     return (

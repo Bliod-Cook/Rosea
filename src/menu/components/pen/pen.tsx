@@ -1,5 +1,5 @@
 import {Badge, Box, Slider, Stack} from "@mui/material"
-import {emit} from "@tauri-apps/api/event";
+import {emitTo} from "@tauri-apps/api/event";
 import { pink, blue, red, orange, cyan, brown, grey, common, green, indigo, purple, lime, blueGrey, yellow, teal } from '@mui/material/colors';
 import {Circle} from "@mui/icons-material";
 import {useState} from "react";
@@ -12,13 +12,13 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
         const colorL = new Array(16).fill(false);
         colorL[color] = true
         setColorList(colorL)
-        emit("change-penColor", colorNumberList[color]).then()
+        emitTo("canvas", "change://canvas/penColor", colorNumberList[color]).then()
         console.log(colorNumberList[color])
     }
 
     function changeWidth(_event: Event, value: number | number[]) {
         if (typeof value == "number") {
-            emit("change-lineWidth",value).then()
+            emitTo("canvas", "change://canvas/lineWidth", value).then()
             setLineWidth(value)
         }
     }

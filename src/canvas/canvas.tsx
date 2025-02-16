@@ -2,7 +2,6 @@ import {useEffect} from "react";
 import {currentMonitor, getCurrentWindow, PhysicalSize} from "@tauri-apps/api/window";
 import "./canvas.scss"
 import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
-import { write as gWrite } from "../init/tray.ts";
 import Konva from "konva";
 
 export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
@@ -24,24 +23,23 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
         let isErasing = false;
 
-
         let isPaint = false;
         let lastLine: Konva.Line;
 
-
         const window = getCurrentWindow()
 
-        window.listen("fresh-write-mode", ()=>{
-            window.setIgnoreCursorEvents((gWrite === 1)).then()
-            isErasing = gWrite === 3;
+        window.listen("change://canvas/mode", (event) => {
+            window.setIgnoreCursorEvents(event.payload == 1).then()
+            isErasing = event.payload == 3
         }).then()
-        window.listen("change-lineWidth", (e)=>{
+
+        window.listen("change://canvas/lineWidth", (e)=>{
             lineWidth = e.payload as number
         }).then()
-        window.listen("change-penColor", (e)=> {
+        window.listen("change://canvas/penColor", (e)=> {
             color = e.payload as string
         }).then()
-        window.listen("change-eraserSize", (e)=>{
+        window.listen("change://canvas/eraserSize", (e)=>{
             eraserSize = e.payload as number
         }).then()
 
@@ -58,7 +56,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
         stage.add(layer)
 
-        window.listen("clear-eraserSize", ()=>{
+        window.listen("reset://canvas/draw", ()=>{
             layer.destroy()
             layer = new Konva.Layer
             stage.add(layer)

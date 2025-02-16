@@ -12,7 +12,8 @@
   "app": {
     "windows": [
       {
-        "title": "rosea",
+        "label": "main",
+        "title": "Rosea",
         "width": 136,
         "height": 52,
         "resizable": false,
@@ -27,6 +28,75 @@
         "x": 0,
         "y": 0,
         "zoomHotkeysEnabled": false,
+        "maximizable": false
+      },
+      {
+        "label": "canvas",
+        "title": "Canvas",
+        "url": "/canvas/",
+        "x": 0,
+        "y": 0,
+        "width": 400,
+        "height": 400,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "shadow": false,
+        "resizable": false,
+        "skipTaskbar": true,
+        "visible": true,
+        "zoomHotkeysEnabled": false,
+        "maximizable": true,
+        "minimizable": false
+      },
+      {
+        "label": "menu",
+        "title": "Menu",
+        "parent": "canvas",
+        "url": "/menu/",
+        "width": 40,
+        "height": 40,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "shadow": false,
+        "resizable": false,
+        "skipTaskbar": true,
+        "visible": false,
+        "zoomHotkeysEnabled": false,
+        "maximizable": false
+      },
+      {
+        "label": "random",
+        "url": "/randomer/",
+        "title": "Randomer",
+        "width": 120,
+        "height": 180,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "shadow": false,
+        "resizable": false,
+        "skipTaskbar": true,
+        "visible": false,
+        "zoomHotkeysEnabled": false,
+        "maximizable": false
+      },
+      {
+        "label": "random/settings",
+        "url": "/randomer/settings/",
+        "title": "Randomer Settings",
+        "width": 320,
+        "height": 230,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "shadow": false,
+        "resizable": false,
+        "skipTaskbar": true,
+        "visible": false,
+        "zoomHotkeysEnabled": false,
+        "fullscreen": false,
         "maximizable": false
       }
     ],
@@ -50,7 +120,6 @@
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM0MTYzNzI3RTJENkMyNjkKUldScHd0YmlKemNXTkkwZFJHSHV1UThtWmRENTBwUW8yRWhCbzBBbDFYL2F1REoza1hqNHNaTjQK",
       "endpoints": [
         "https://proxy.rosea.planten-dev.top",
-        "https://ghgo.xyz/https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json",
         "https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json"
       ]
     }
