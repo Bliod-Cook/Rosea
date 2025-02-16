@@ -1,56 +1,5 @@
 {
-  "$schema": "https://schema.tauri.app/config/2.0.0-rc",
-  "productName": "Rosea",
-  "version": "0.1.11",
-  "identifier": "Rosea",
-  "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "pnpm run web:dev",
-    "beforeBuildCommand": "pnpm run web:build"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "rosea",
-        "width": 110,
-        "height": 18,
-        "resizable": false,
-        "fullscreen": false,
-        "decorations": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "transparent": true,
-        "shadow": false,
-        "focus": false,
-        "dragDropEnabled": false,
-        "contentProtected": true,
-        "x": 0,
-        "y": 0,
-        "zoomHotkeysEnabled": false,
-        "maximizable": false
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
   "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32.jpg",
-      "icons/128.jpg",
-      "icons/64.jpg",
-      "icons/icon.ico"
-    ]
-  },
-  "plugins": {
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM0MTYzNzI3RTJENkMyNjkKUldScHd0YmlKemNXTkkwZFJHSHV1UThtWmRENTBwUW8yRWhCbzBBbDFYL2F1REoza1hqNHNaTjQK",
-      "endpoints": [
-        "https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json"
-      ]
-    }
+    "createUpdaterArtifacts": false
   }
 }

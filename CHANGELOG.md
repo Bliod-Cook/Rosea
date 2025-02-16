@@ -1,3 +1,11 @@
+## 0.2.0
+
+Refactor:
+1. Remove meaningless code
+2. Move page registration to config file
+
+---
+
 ## 0.1.11
 
 Feat:

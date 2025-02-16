@@ -11,7 +11,7 @@ export default function EraserSettings() {
         value: number,
     ) {
         setSize(value)
-        emitTo("canvas", "change-eraserSize", value).then()
+        emitTo("canvas", "change://canvas/eraserSize", value).then()
     }
 
     return <>

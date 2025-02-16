@@ -48,8 +48,6 @@ jobs:
         run: |
           pnpm update
           pnpm i
-          rm src-tauri/tauri.conf.json
-          mv src-tauri/tauri.devbuild.conf.json src-tauri/tauri.conf.json
 
       # If tagName and releaseId are omitted tauri-action will only build the app and won't try to upload any assets.
       - uses: tauri-apps/tauri-action@v0
@@ -57,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tauriScript: pnpm
-          args: ${{ matrix.args }}
+          args: ${{ matrix.args }} --config src-tauri/tauri.devbuild.conf.json
 
       - name: Upload Artifacts
         if: matrix.platform == 'windows-latest'

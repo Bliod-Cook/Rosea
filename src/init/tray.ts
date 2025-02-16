@@ -2,7 +2,7 @@ import { TrayIcon } from "@tauri-apps/api/tray";
 import {defaultWindowIcon} from "@tauri-apps/api/app";
 import {Menu} from "@tauri-apps/api/menu";
 import {invoke} from "@tauri-apps/api/core";
-import {emitTo, listen} from "@tauri-apps/api/event";
+import {emit, listen} from "@tauri-apps/api/event";
 import { Update } from "./update.ts";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/plugin-notification";
 
@@ -13,9 +13,9 @@ const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
 })
 
 export let moveable = false;
-export let click_through = false;
+export let visibility = true;
 export let manual_update_check = false;
-export let write = 1;
+export let canvas_mode = 1;
 
 export async function initTray() {
     await changeTray()
@@ -27,12 +27,12 @@ async function changeTray()  {
             {
                 id: "moveable",
                 text: `Moveable ${moveable?"√":"×"}`,
-                action: () => {moveable = !moveable; emitTo("main", "change_moveable").then(()=>{changeTray()})}
+                action: () => {moveable = !moveable; emit("change://clock/move-ability", moveable).then(()=>{changeTray()})}
             },
             {
                 id: "click_through",
-                text: `ClickThrough ${click_through?"√":"×"}`,
-                action: () => {click_through = !click_through; emitTo("main", "change-clickThrough").then(()=>{changeTray()})}
+                text: `ClickThrough ${!visibility?"√":"×"}`,
+                action: () => {visibility = !visibility; emit("change://clock/visibility", visibility).then(()=>{changeTray()})}
             },
             {
                 id: "check_update",
@@ -42,7 +42,7 @@ async function changeTray()  {
             {
                 id: "Quit",
                 text: "Quit",
-                action: quit,
+                action: () => {invoke("quit")},
             },
         ]
     })
@@ -69,18 +69,17 @@ listen("newest-version", async () => {
     }
 }).then()
 
-listen("change-lock",()=>{
-    moveable = !moveable; emitTo("main","change_moveable").then(()=>{changeTray().then()})
+listen("change://clock/move-ability", (event) => {
+    moveable = event.payload as boolean
+    changeTray().then()
 }).then()
 
-listen("change-click_through",()=>{
-    click_through = !click_through; emitTo("main", "change-clickThrough").then(()=>{changeTray().then()})
+listen("change://clock/visibility", (event) => {
+    visibility = event.payload as boolean
+    changeTray().then()
 }).then()
 
-listen("change-write",(e)=>{
-    write = <number>e.payload; emitTo("canvas","fresh-write-mode").then(()=>{changeTray().then()})
+listen("change://canvas/mode", (event) => {
+    canvas_mode = event.payload as number
+    changeTray().then()
 }).then()
-
-function quit() {
-    invoke("quit").then()
-}
