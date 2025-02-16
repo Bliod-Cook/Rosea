@@ -3,18 +3,42 @@ import {emitTo} from "@tauri-apps/api/event";
 import { pink, blue, red, orange, cyan, brown, grey, common, green, indigo, purple, lime, blueGrey, yellow, teal } from '@mui/material/colors';
 import {Circle} from "@mui/icons-material";
 import {useState} from "react";
+
+type Color = {
+  hex: string;
+  mui: string;
+}
+const COLORS: Color[] = [
+    { hex: "#e91e63", mui: pink[500] },
+    { hex: "#2196f3", mui: blue[500] },
+    { hex: "#d32f2f", mui: red[700] },
+    { hex: "#ff9800", mui: orange[500] },
+    { hex: "#00bcd4", mui: cyan[500] },
+    { hex: "#795548", mui: brown[500] },
+    { hex: "#9e9e9e", mui: grey[500] },
+    { hex: "#000", mui: common["black"] },
+    { hex: "#fff", mui: common["white"] },
+    { hex: "#cddc39", mui: lime[500] },
+    { hex: "#9c27b0", mui: purple[500] },
+    { hex: "#3f51b5", mui: indigo[500] },
+    { hex: "#66bb6a", mui: green[500] },
+    { hex: "#607d8b", mui: blueGrey[500] },
+    { hex: "#ffeb3b", mui: yellow[500] },
+    { hex: "#009688", mui: teal[500] },
+];
+
 export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: number, setLineWidth: (number: number) => void}) {
 
-    const [colorList, setColorList] = useState((new Array(16)).fill(false))
+    const [colorList, setColorList] = useState<boolean[]>((new Array(COLORS.length)).fill(false));
 
-    function enableColor(color: number) {
-        const colorNumberList = ["#e91e63", "#2196f3", "#d32f2f", "#ff9800", "#00bcd4", "#795548", "#9e9e9e", "#000", "#fff", "#cddc39", "#9c27b0", "#3f51b5", "#66bb6a", "#607d8b", "#ffeb3b", "#009688"]
-        const colorL = new Array(16).fill(false);
-        colorL[color] = true
-        setColorList(colorL)
-        emitTo("canvas", "change://canvas/penColor", colorNumberList[color]).then()
-        console.log(colorNumberList[color])
+    function enableColor(colorIndex: number) {
+        const newColorList = new Array(COLORS.length).fill(false);
+        newColorList[colorIndex] = true;
+        setColorList(newColorList);
+        emitTo("canvas", "change://canvas/penColor", COLORS[colorIndex].hex).then();
+        console.log(COLORS[colorIndex].hex)
     }
+    
 
     function changeWidth(_event: Event, value: number | number[]) {
         if (typeof value == "number") {
@@ -24,7 +48,7 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
     }
 
     return <>
-        <div className={"slide-bar"}>
+        <Box className={"slide-bar"}>
             <Box width={150} marginX={"auto"} marginTop={"12px"}>
                 <Slider
                     marks={true}
@@ -39,7 +63,7 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
                 ></Slider>
             </Box>
             <Box
-                width={250}
+                width={260}
                 marginX={"auto"}
             >
                 <Stack
@@ -47,25 +71,17 @@ export default function PenSettings({lineWidth, setLineWidth}: {lineWidth: numbe
                     direction={"row"}
                     useFlexGap={true}
                     sx={{ flexWrap: 'wrap' }}
+                    marginX={"auto"}
                 >
-                    <Badge onClick={()=>{enableColor(0)}} variant={"dot"} color={colorList[0] ? "primary" : undefined}><Circle sx={{ color: pink[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(1)}} variant={"dot"} color={colorList[1] ? "primary" : undefined}><Circle sx={{ color: blue[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(2)}} variant={"dot"} color={colorList[2] ? "primary" : undefined}><Circle sx={{ color: red[700] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(3)}} variant={"dot"} color={colorList[3] ? "primary" : undefined}><Circle sx={{ color: orange[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(4)}} variant={"dot"} color={colorList[4] ? "primary" : undefined}><Circle sx={{ color: cyan[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(5)}} variant={"dot"} color={colorList[5] ? "primary" : undefined}><Circle sx={{ color: brown[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(6)}} variant={"dot"} color={colorList[6] ? "primary" : undefined}><Circle sx={{ color: grey[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(7)}} variant={"dot"} color={colorList[7] ? "primary" : undefined}><Circle sx={{ color: common["black"] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(8)}} variant={"dot"} color={colorList[8] ? "primary" : undefined}><Circle sx={{ color: common["white"] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(9)}} variant={"dot"} color={colorList[9] ? "primary" : undefined}><Circle sx={{ color: lime[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(10)}} variant={"dot"} color={colorList[10] ? "primary" : undefined}><Circle sx={{ color: purple[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(11)}} variant={"dot"} color={colorList[11] ? "primary" : undefined}><Circle sx={{ color: indigo[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(12)}} variant={"dot"} color={colorList[12] ? "primary" : undefined}><Circle sx={{ color: green[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(13)}} variant={"dot"} color={colorList[13] ? "primary" : undefined}><Circle sx={{ color: blueGrey[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(14)}} variant={"dot"} color={colorList[14] ? "primary" : undefined}><Circle sx={{ color: yellow[500] }}></Circle></Badge>
-                    <Badge onClick={()=>{enableColor(15)}} variant={"dot"} color={colorList[15] ? "primary" : undefined}><Circle sx={{ color: teal[500] }}></Circle></Badge>
+                    {COLORS.map((color, index) => (
+                        <Box key={index} width={25} marginX={"auto"}>
+                        <Badge  onClick={()=>{enableColor(index)}} variant={"dot"} color={colorList[index] ? "primary" : undefined}>
+                            <Circle sx={{ color: color.mui }}></Circle>
+                        </Badge>
+                        </Box>
+                    ))}
                 </Stack>
             </Box>
-        </div>
+        </Box>
     </>
 }
