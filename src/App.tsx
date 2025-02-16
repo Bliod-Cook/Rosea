@@ -7,14 +7,18 @@ import {Box} from "@mui/material";
 
 export default function App() {
     const [time, setTime] = useState((new Date()).toLocaleTimeString())
-    setInterval(() => {
-        setTime((new Date()).toLocaleTimeString())
-    }, 1000)
+
+    useEffect(() => {
+        setInterval(() => {
+            setTime((new Date()).toLocaleTimeString())
+        }, 1000)
+    }, []);
 
     const [moveable, setMoveable] = useState(false)
 
     function changeMoveable() {
         setMoveable(gMoveable);
+        getCurrentWindow().setIgnoreCursorEvents(!gMoveable).then()
     }
 
     function moveToTopLeft() {
@@ -34,7 +38,7 @@ export default function App() {
             }
         }).then()
         window.listen("move-top-left", moveToTopLeft).then()
-    });
+    }, []);
 
     return (
         <>

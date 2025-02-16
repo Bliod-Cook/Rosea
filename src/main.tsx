@@ -25,7 +25,6 @@ createRoot(document.getElementById('root')!).render(
                     <Route index element={<RandomWindow/>}></Route>
                     <Route path="settings" element={<RandomSettingsPage/>} />
                 </Route>
-
             </Routes>
         </BrowserRouter>
     </StrictMode>,

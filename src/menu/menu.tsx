@@ -24,6 +24,8 @@ export default function Menu() {
     const [canClickThrough, setCanClickThrough] = useState(click_through)
     const [write, setWrite] = useState(1);
 
+    const [remainingTime, setRemainingTime] = useState(60);
+    const [countdownIntervalId, setCountdownIntervalId] = useState<NodeJS.Timeout | null>(null);
     const [ctTimeoutId, setCtTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
     const [lineWidth, setLineWidth] = useState(3)
@@ -43,8 +45,10 @@ export default function Menu() {
     }, []);
 
     useEffect(() => {
-        getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()
-        getCurrentWindow().setSize(sizeDefault).then()
+        return () => {
+            getCurrentWindow().setPosition(new PhysicalPosition(100, 100)).then()
+            getCurrentWindow().setSize(sizeDefault).then()
+        }
     }, [sizeDefault]);
 
     useEffect(() => {
@@ -154,29 +158,44 @@ export default function Menu() {
                      onContextMenu={(e) => {e.preventDefault(); emitTo("main","move-top-left").then()}}
                 ></div>
                 <div className={`click-through-icon ${canClickThrough ? "enabled" : "disabled"}`} onClick={() => {
-                    // 切换前清除现有定时器
                     if (ctTimeoutId) {
                         clearTimeout(ctTimeoutId);
                         setCtTimeoutId(null);
+                    }
+                    if (countdownIntervalId) {
+                        clearInterval(countdownIntervalId);
+                        setCountdownIntervalId(null);
                     }
 
                     emit("change-click_through").then(() => {
                         const newState = !canClickThrough;
                         setCanClickThrough(newState);
 
-                        // 如果开启状态，设置自动关闭定时器
                         if (newState) {
+                            setRemainingTime(60);
+                            const interval = setInterval(() => {
+                                setRemainingTime(prev => Math.max(0, prev - 1));
+                            }, 1000);
+                            setCountdownIntervalId(interval);
+
                             const timeoutId = setTimeout(() => {
                                 emit("change-click_through").then(() => {
                                     setCanClickThrough(false);
-                                    setCtTimeoutId(null);
+                                    setRemainingTime(0);
                                 });
+                                clearInterval(interval);
+                                setCountdownIntervalId(null);
                             }, 60000);
-
                             setCtTimeoutId(timeoutId);
+                        } else {
+                            setRemainingTime(0);
                         }
                     });
-                }}></div>
+                }}>
+                    {canClickThrough && remainingTime > 0 && (
+                        <span className="countdown-text">{remainingTime}</span>
+                    )}
+                </div>
             </div>
         </div>
         <div>
