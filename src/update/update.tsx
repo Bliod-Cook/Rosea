@@ -15,7 +15,7 @@ export default function Update() {
         moveWindow(Position.Center).then()
     }, []);
 
-    useState(((): number => {
+    useEffect(() => {
         let downloaded_length = 0;
         try {
             check().then(async (update) => {
@@ -42,8 +42,7 @@ export default function Update() {
                 setTimeout(()=>{getCurrentWindow().close().then()}, 30000)
             })
         } catch (e) {console.log(e)}
-        return 1
-    })())
+    })
 
     return <Box className={"root-div"} display={"flex"} flexDirection={"column"}>
         <Box marginX={"auto"}><h1>{isStart ? (((downloaded / contentLength) * 100).toFixed(1) + "%") : "wait"}</h1></Box>
