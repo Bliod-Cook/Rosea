@@ -1,5 +1,5 @@
 import "./menu.scss"
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import { getCurrentWindow, LogicalSize, PhysicalPosition } from "@tauri-apps/api/window";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { visibility as default_visibility, moveable as default_moveAbility } from "../init/tray.ts";
@@ -12,9 +12,9 @@ import { Buffer } from 'buffer'
 import { Box } from "@mui/material";
 
 export default function Menu() {
-    const [sizeDefault] = useState(new LogicalSize(40, 40))
-    const [sizeFirst] = useState(new LogicalSize(275, 40))
-    const [sizeSecond] = useState(new LogicalSize(275, 160))
+    const sizeDefault = useMemo(()=> new LogicalSize(40, 40), [])
+    const sizeFirst = useMemo(() => new LogicalSize(275, 40), [])
+    const sizeSecond = useMemo(() => new LogicalSize(275, 160), [])
 
     const [open, setOpen] = useState(false)
     const [secondOpen, setSecondOpen] = useState(false)

@@ -18,15 +18,14 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
     useEffect(() => {
         let lineWidth = 3;
-        let color = "#d32f2f"
+        let color = "#d32f2f";
         let eraserSize = 60;
 
         let isErasing = false;
-
         let isPaint = false;
         let lastLine: Konva.Line;
 
-        const window = getCurrentWindow()
+        const window = getCurrentWindow();
 
         window.listen("change://canvas/mode", (event) => {
             window.setIgnoreCursorEvents(event.payload == 1).then()

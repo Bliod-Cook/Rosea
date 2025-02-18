@@ -37,16 +37,6 @@ export default function RandomPage() {
     }
 
     async function random() {
-        /*// DEBUG
-        console.log("DEBUG START")
-        // const chance = (new (await import("chance")).Chance())
-        const list = Array(48).fill(0);
-        for (let i = 1; i < 2000000; i++) {
-            list[await getRandomNumber()-1] += 1
-        }
-        console.log(list)
-        // DEBUG FINISHED*/
-
         setRandomNumber(await getRandomNumber())
     }
 
