@@ -13,8 +13,8 @@
     "changelog": "node scripts/changelog.mjs"
   },
   "dependencies": {
+    "@base-ui-components/react": "1.0.0-alpha.6",
     "@ltd/j-toml": "^1.38.0",
-    "@mui/base": "5.0.0-beta.69",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "@tauri-apps/api": "^2.2.0",

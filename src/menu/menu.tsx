@@ -1,5 +1,5 @@
 import "./menu.scss"
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, useCallback} from "react";
 import { getCurrentWindow, LogicalSize, PhysicalPosition } from "@tauri-apps/api/window";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { visibility as default_visibility, moveable as default_moveAbility } from "../init/tray.ts";
@@ -12,7 +12,7 @@ import { Buffer } from 'buffer'
 import { Box } from "@mui/material";
 
 export default function Menu() {
-    const sizeDefault = useMemo(()=> new LogicalSize(40, 40), [])
+    const sizeDefault = useMemo(() => new LogicalSize(40, 40), [])
     const sizeFirst = useMemo(() => new LogicalSize(275, 40), [])
     const sizeSecond = useMemo(() => new LogicalSize(275, 160), [])
 
@@ -33,7 +33,7 @@ export default function Menu() {
 
     useEffect(() => {
         exists('menu.png', {baseDir: BaseDirectory.AppLocalData})
-            .then(async (e)=>{
+            .then(async (e) => {
                 if (e) {
                     const customizedMenuIcon = await readFile('menu.png', {baseDir: BaseDirectory.AppLocalData})
                     setMenuIcon(`data:image/jpg;base64,${Buffer.from(customizedMenuIcon).toString('base64')}`)
@@ -71,17 +71,20 @@ export default function Menu() {
         };
     }, [ctTimeoutId]);
 
-    async function changeOpen() {
-        const window = getCurrentWindow();
+    const toggleMenu = useCallback(async () => {
+        const currentWindow = await getCurrentWindow();
         if (!open) {
-            await window.setSize(sizeSecond)
-            setOpen(!open)
+            await currentWindow.setSize(sizeSecond);
+            setOpen(true);
         } else {
-            setOpen(!open)
-            setSecondOpen(false)
-            setTimeout(async ()=>{await window.setSize(sizeDefault)}, 500)
+            setOpen(false);
+            setSecondOpen(false);
+            // delay before reverting to the default size
+            setTimeout(async () => {
+                await currentWindow.setSize(sizeDefault);
+            }, 500);
         }
-    }
+    }, [open, sizeSecond, sizeDefault]);
 
     async function closeSecondLayer() {
         const window = getCurrentWindow();
@@ -95,7 +98,6 @@ export default function Menu() {
         setSecondOpen(true)
     }
 
-
     return <div className={`main ${open ? "opened": ""} ${secondOpen ? "second-opened": ""}`}
                 onContextMenu={(e)=>{e.preventDefault()}}
     >
@@ -103,7 +105,7 @@ export default function Menu() {
             <Box>
                 <div
                     className={`menu-icon ${open ? "enabled" : "disabled"} ${customizedMenuIcon ? "customizedMenuIcon" : ""}`}
-                    onClick={changeOpen}
+                    onClick={toggleMenu}
                     style={{
                         content: `url(${menuIcon})`,
                     }}

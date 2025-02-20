@@ -2,7 +2,7 @@ import "../assets/global.scss"
 import RandomerStyle from "./randomer.module.scss"
 import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
-import {BaseDirectory, create, exists, readTextFile} from "@tauri-apps/plugin-fs";
+import {BaseDirectory, create, exists, readTextFile, readFile} from "@tauri-apps/plugin-fs";
 import TOML from "@ltd/j-toml";
 import {Box, Button, LinearProgress} from "@mui/material";
 import {getCurrentWindow} from "@tauri-apps/api/window";
@@ -14,6 +14,9 @@ export default function RandomPage() {
     const [randomNumber, setRandomNumber] = useState(0)
     const [max, setMax] = useState(0); const [min, setMin] = useState(0)
     const [history] = useState(new historyNumber())
+    const [id, setId] = useState<Map<string, string> | null>(null);
+
+    const [showName, setShowName] = useState(false)
 
     async function getRandomNumber() {
         const weightList: number[] = Array(max - min + 1).fill(100)
@@ -50,18 +53,21 @@ export default function RandomPage() {
     }
 
     useEffect(() => {
-        setRange().then()
+        readConfig().then()
+        readIdCsv().then();
+
         const window = getCurrentWindow();
+        window.listen('reload://randomer/config', readConfig).then()
+    }, []);
 
-        window.listen('random-range-set', setRange).then()
-    });
-
-    async function setRange() {
-        const [minN, maxN]: [number, number] = await rNumber()
+    async function readConfig() {
+        const [minN, maxN, showName]: [number, number, boolean] = await rConfig()
         if (maxN === max && minN === min) { /* empty */ } else {
             history.reset()
         }
-        setMax(maxN); setMin(minN)
+        setMax(maxN)
+        setMin(minN)
+        setShowName(showName)
     }
 
     async function notify_reset() {
@@ -71,6 +77,33 @@ export default function RandomPage() {
         );
     }
 
+    async function readIdCsv() {
+        try {
+            if (await exists('id.csv', { baseDir: BaseDirectory.AppLocalData })) {
+                const csvContent = new TextDecoder("gbk").decode(await readFile('id.csv', { baseDir: BaseDirectory.AppLocalData }));
+                const lines = csvContent.split('\n');
+                const idMap: Map<string, string> = new Map();
+
+                // Read start from line 1
+                for (const line of lines) {
+                    if (line.trim() === "") continue; // Skip empty line
+                    const parts = line.split(',');
+                    if (parts.length >= 2) {
+                        const id = parts[0].trim();
+                        const name = parts[1].trim();
+                        idMap.set(id, name);
+                    }
+                }
+                setId(idMap);
+            }
+        } catch (error) {
+            console.error("读取 id.csv 文件失败:", error);
+            await message(`读取 id.csv 文件失败: ${error}`, {title: '错误', kind: 'error'})
+            setId(null); // If failed, set it to null
+        }
+    }
+
+
     return (
         <>
             <Box className={`${RandomerStyle.background} drag-region`}
@@ -79,7 +112,7 @@ export default function RandomPage() {
                  }}
             >
                 <Box unselectable={"on"} textAlign={"center"} height={"30px"}>
-                    <Box marginTop={"20px"}>{randomNumber}</Box>
+                    <Box marginTop={"20px"}>{randomNumber}{showName ? `, ${id?.get(String(randomNumber)) ?? "None"}` : ""}</Box>
                 </Box>
                 <Box
                     width={120}
@@ -125,7 +158,7 @@ export default function RandomPage() {
     )
 }
 
-async function rNumber(): Promise<[number, number]> {
+async function rConfig(): Promise<[number, number, boolean]> {
     if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
         await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
     }
@@ -135,7 +168,8 @@ async function rNumber(): Promise<[number, number]> {
     )
     const maxN = Number(configData["random_max"] ?? 48)
     const minN = Number(configData["random_min"] ?? 1)
-    return [minN, maxN]
+    const showName = Boolean(configData["show_name"] ?? false)
+    return [minN, maxN, showName]
 }
 
 class historyNumber {
