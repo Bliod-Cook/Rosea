@@ -1,3 +1,10 @@
+## 0.3.0
+
+Feat:
+1. Add showName option.Put id.csv in AppLocalData Directory(line1: id, line2: name) to use this feature
+
+---
+
 ## 0.2.0
 
 Refactor:
@@ -9,7 +16,7 @@ Refactor:
 ## 0.1.11
 
 Feat:
-1. Auto close clich_through mode after 60s
+1. Auto close click_through mode after 60s
 
 Chore:
 1. Update Deps
