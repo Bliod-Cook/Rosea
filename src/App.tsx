@@ -5,7 +5,7 @@ import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
 import {Box} from "@mui/material";
 
 export default function App() {
-    const [time, setTime] = useState((new Date()).toLocaleTimeString())
+    const [time, setTime] = useState(new Date().toLocaleTimeString())
 
     useEffect(() => {
         setInterval(() => {
@@ -49,7 +49,11 @@ export default function App() {
                 <Box
                     marginX={"auto"}
                     marginY={"auto"}
-                ><span>{time}</span></Box>
+                >
+                    <span>
+                        {time}
+                    </span>
+                </Box>
             </div>
         </>
     )

@@ -2,8 +2,8 @@ import "../assets/global.scss"
 import RandomerStyle from "./randomer.module.scss"
 import {useEffect, useState} from "react";
 import {WebviewWindow as TauriWebviewWindow} from "@tauri-apps/api/webviewWindow";
-import {BaseDirectory, create, exists, readTextFile, readFile} from "@tauri-apps/plugin-fs";
-import TOML from "@ltd/j-toml";
+import {BaseDirectory, exists, readFile} from "@tauri-apps/plugin-fs";
+import { rConfig } from "./config.ts";
 import {Box, Button, LinearProgress} from "@mui/material";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import { message } from '@tauri-apps/plugin-dialog';
@@ -53,7 +53,7 @@ export default function RandomPage() {
     }
 
     useEffect(() => {
-        readConfig().then()
+        readConfig().then();
         readIdCsv().then();
 
         const window = getCurrentWindow();
@@ -156,20 +156,6 @@ export default function RandomPage() {
             </Box>
         </>
     )
-}
-
-async function rConfig(): Promise<[number, number, boolean]> {
-    if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
-        await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
-    }
-    const config = (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
-    const configData = TOML.parse(
-        config
-    )
-    const maxN = Number(configData["random_max"] ?? 48)
-    const minN = Number(configData["random_min"] ?? 1)
-    const showName = Boolean(configData["show_name"] ?? false)
-    return [minN, maxN, showName]
 }
 
 class historyNumber {
