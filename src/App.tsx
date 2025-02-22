@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import "./App.scss"
 import {getCurrentWindow} from "@tauri-apps/api/window";
-import {visibility as gClickThrough} from "./init/tray.ts";
 import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
 import {Box} from "@mui/material";
 
@@ -22,6 +21,9 @@ export default function App() {
 
     useEffect(() => {
         const window = getCurrentWindow();
+
+        window.setIgnoreCursorEvents(true).then()
+
         window.listen("change://clock/move-ability", (event) => {
             setMoveable(event.payload as boolean)
         }).then()
