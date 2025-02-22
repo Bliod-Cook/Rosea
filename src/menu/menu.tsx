@@ -74,7 +74,7 @@ export default function Menu() {
     const toggleMenu = useCallback(async () => {
         const currentWindow = await getCurrentWindow();
         if (!open) {
-            await currentWindow.setSize(sizeSecond);
+            await currentWindow.setSize(sizeFirst);
             setOpen(true);
         } else {
             setOpen(false);
@@ -84,7 +84,7 @@ export default function Menu() {
                 await currentWindow.setSize(sizeDefault);
             }, 500);
         }
-    }, [open, sizeSecond, sizeDefault]);
+    }, [open, sizeFirst, sizeDefault]);
 
     async function closeSecondLayer() {
         const window = getCurrentWindow();
