@@ -35,14 +35,6 @@ export default function App() {
         }).then()
 
         window.listen("reset://clock/position", moveToTopLeft).then()
-
-        window.listen("change-clickThrough", () => {
-            if (gClickThrough) {
-                window.hide().then();
-            } else {
-                window.show().then()
-            }
-        }).then()
     }, []);
 
     return (
