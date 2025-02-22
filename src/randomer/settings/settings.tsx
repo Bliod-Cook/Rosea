@@ -1,6 +1,7 @@
 import "../../assets/global.scss"
 import SettingsStyle from './settings.module.scss'
 import TOML from "@ltd/j-toml"
+import {rConfig} from "../config.ts";
 import {useEffect, useState} from "react";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
@@ -83,18 +84,4 @@ function isIllegal(i: string): boolean {
     if (!Number.isInteger(Number(i))) return true
     console.log(Number.isInteger(i))
     return isNaN(Number(i))
-}
-
-async function rConfig(): Promise<[number, number, boolean]> {
-    if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
-        await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
-    }
-    const config = (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
-    const configData = TOML.parse(
-        config
-    )
-    const maxN = Number(configData["random_max"] ?? 48)
-    const minN = Number(configData["random_min"] ?? 1)
-    const showName = Boolean(configData["show_name"] ?? false)
-    return [minN, maxN, showName]
 }
