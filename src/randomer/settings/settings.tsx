@@ -1,54 +1,60 @@
 import "../../assets/global.scss"
 import SettingsStyle from './settings.module.scss'
 import TOML from "@ltd/j-toml"
-import {rConfig} from "../config.ts";
-import {useEffect, useState} from "react";
-import {getCurrentWindow} from "@tauri-apps/api/window";
-import {BaseDirectory, create, exists, readTextFile, writeTextFile} from "@tauri-apps/plugin-fs";
-import {Box, Button, Switch, TextField} from "@mui/material";
-import {emitTo} from "@tauri-apps/api/event";
+import { rConfig } from "../config.ts";
+import { useEffect, useState } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { BaseDirectory, create, exists, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { Box, Button, Switch, TextField } from "@mui/material";
+import { emitTo } from "@tauri-apps/api/event";
+
+const CONFIG_FILE = "config.toml"
 
 export default function RandomSettingsPage() {
-    const [input1, setInput1] = useState("");
-    const [input2, setInput2] = useState("");
-    const [showName, setShowName] = useState(false)
+    const [input1, setInput1] = useState<string>("");
+    const [input2, setInput2] = useState<string>("");
+    const [showName, setShowName] = useState<boolean>(false);
 
     useEffect(() => {
-        rConfig().then((r) => {
-            const [min, max, showName] = r
-            setInput1(String(min))
-            setInput2(String(max))
-            setShowName(showName)
-        })
+        rConfig().then(([min, max, showName]) => {
+            setInput1(String(min));
+            setInput2(String(max));
+            setShowName(showName);
+        });
     }, []);
 
     async function closeWindow() {
         await getCurrentWindow().hide();
-        setInput1(""); setInput2("");
+        resetInputs();
+    }
+
+    function resetInputs() {
+        setInput1("");
+        setInput2("");
     }
 
     async function save() {
-        if (isIllegal(input1) || isIllegal(input2) || input1 > input2) { return }
+        if (isIllegal(input1) || isIllegal(input2) || input1 > input2) return;
 
-        if (!(await exists('config.toml', {baseDir: BaseDirectory.AppLocalData}))) {
-            await create('config.toml', {baseDir: BaseDirectory.AppLocalData})
+        if (!(await exists(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData }))) {
+            await create(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData });
         }
 
-        // const TOML = await import("@iarna/toml")
         const configData = TOML.parse(
-            (await readTextFile('config.toml', {baseDir: BaseDirectory.AppLocalData})).slice(1, -1).split(",").join("\n")
-        )
-        configData["random_min"] = String(Number(input1))
-        configData["random_max"] = String(Number(input2))
-        configData["show_name"] = showName
+            (await readTextFile(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData })).slice(1, -1).split(",").join("\n")
+        );
+        configData["random_min"] = String(Number(input1));
+        configData["random_max"] = String(Number(input2));
+        configData["show_name"] = showName;
+
         await writeTextFile(
-            'config.toml',
-            // @ts-expect-error Its Work
+            CONFIG_FILE,
+            // @ts-expect-error It work:)
             TOML.stringify(configData),
-            {baseDir: BaseDirectory.AppLocalData}
-        )
-        emitTo('random', 'reload://randomer/config').then()
-        await getCurrentWindow().hide()
+            { baseDir: BaseDirectory.AppLocalData }
+        );
+        emitTo('random', 'reload://randomer/config').then();
+        await getCurrentWindow().hide();
     }
 
     return <Box className={`${SettingsStyle.background} drag-region`} onScroll={(e) => {e.preventDefault()}}>
@@ -80,8 +86,5 @@ export default function RandomSettingsPage() {
 }
 
 function isIllegal(i: string): boolean {
-    if (i.length === 0) return true
-    if (!Number.isInteger(Number(i))) return true
-    console.log(Number.isInteger(i))
-    return isNaN(Number(i))
+    return i.length === 0 || !Number.isInteger(Number(i)) || isNaN(Number(i));
 }
