@@ -19,12 +19,12 @@ export async function Update() {
         title: "更新",
         width: 250,
         height: 180,
-        transparent: true,
-        alwaysOnTop: true,
+        transparent: false,
+        alwaysOnTop: false,
         decorations: false,
         shadow: false,
         resizable: false,
-        skipTaskbar: true,
+        skipTaskbar: false,
         visible: false,
         maximizable: false
     })
