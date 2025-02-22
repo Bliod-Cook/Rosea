@@ -1,3 +1,9 @@
+## 0.3.1
+
+fix(menu): fix wrong window size
+
+---
+
 ## 0.3.0
 
 Feat:
