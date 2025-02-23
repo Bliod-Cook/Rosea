@@ -46,6 +46,6 @@ export default function Update() {
 
     return <Box className={"root-div"} display={"flex"} flexDirection={"column"}>
         <Box marginX={"auto"}><h1>{isStart ? (((downloaded / contentLength) * 100).toFixed(1) + "%") : "wait"}</h1></Box>
-        <Box marginX={"auto"} width={"250px"}><LinearProgress value={isStart ? (downloaded/contentLength) : undefined} variant={isStart ? "determinate" : undefined}></LinearProgress></Box>
+        <Box marginX={"auto"} width={"250px"}><LinearProgress value={isStart ? (downloaded*100/contentLength) : undefined} variant={isStart ? "determinate" : undefined}></LinearProgress></Box>
     </Box>
 }
