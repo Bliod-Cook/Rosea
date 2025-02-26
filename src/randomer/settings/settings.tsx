@@ -60,22 +60,22 @@ export default function RandomSettingsPage() {
     return <Box className={`${SettingsStyle.background} drag-region`} onScroll={(e) => {e.preventDefault()}}>
         <Box className={`${SettingsStyle.InputBars} ${SettingsStyle.center}`}>
             <Box id={"InputMin"}
-                 className={`no-drag-region`}
+                 className={`drag-region`}
                  marginTop={"25px"}
             >
-                <TextField variant={"outlined"} color={"secondary"} label={"Min"} size={"small"} error={isIllegal(input1)} onChange={(c) => {setInput1(c.target.value)}} value={input1}></TextField>
+                <TextField className={`no-drag-region`} variant={"outlined"} color={"secondary"} label={"Min"} size={"small"} error={isIllegal(input1)} onChange={(c) => {setInput1(c.target.value)}} value={input1}></TextField>
             </Box>
             <Box id={"InputMax"}
-                 className={`no-drag-region`}
+                 className={`drag-region`}
                  marginTop={"20px"}
             >
-                <TextField variant={"outlined"} color={"secondary"} label={"Max"} size={"small"} error={isIllegal(input2)} onChange={(c) => {setInput2(c.target.value)}} value={input2}></TextField>
+                <TextField className={`no-drag-region`} variant={"outlined"} color={"secondary"} label={"Max"} size={"small"} error={isIllegal(input2)} onChange={(c) => {setInput2(c.target.value)}} value={input2}></TextField>
             </Box>
             <Box id={"SwitchShowName"}
-                 className={`no-drag-region`}
+                 className={`drag-region`}
                  marginTop={"5px"}
             >
-                Show Name<Switch onChange={(_, v) => {setShowName(v)}}></Switch>
+                Show Name<Switch className={`no-drag-region`} onChange={(_, v) => {setShowName(v)}}></Switch>
             </Box>
         </Box>
         <Box className={`${SettingsStyle.buttons}`} marginTop={"8px"}>
