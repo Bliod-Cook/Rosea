@@ -35,6 +35,7 @@ jobs:
           workspaces: src-tauri
           cache-all-crates: true
           cache-on-failure: true
+          shared-key: release
 
       - name: setup node
         uses: actions/setup-node@v4
