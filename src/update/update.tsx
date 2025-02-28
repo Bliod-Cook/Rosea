@@ -1,5 +1,5 @@
 import "./update.scss"
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {moveWindow, Position} from '@tauri-apps/plugin-positioner';
@@ -13,6 +13,10 @@ export default function Update() {
     const [downloaded, setDownloaded] = useState(0)
     const [updateStatus, setUpdateStatus] = useState("Checking for updates...")
 
+    const TauriWebviewWindow = useMemo(() => {
+        return getCurrentWindow()
+    }, []);
+
     useEffect(() => {
         moveWindow(Position.Center).then()
     }, []);
@@ -25,7 +29,7 @@ export default function Update() {
                     await update.downloadAndInstall((event) => {
                         switch (event.event) {
                             case "Started":
-                                getCurrentWindow().show()
+                                TauriWebviewWindow.show()
                                 if (event.data.contentLength) {
                                     setIsStart(true)
                                     setContentLength(event.data.contentLength)
@@ -44,7 +48,7 @@ export default function Update() {
                     setUpdateStatus("Already on the latest version")
                     const timeout = setTimeout(() => {
                         emit("notice://newest-version").then()
-                        getCurrentWindow().close().then()
+                        TauriWebviewWindow.close().then()
                     }, 1500)
                     return () => {clearTimeout(timeout)}
                 }
@@ -52,8 +56,9 @@ export default function Update() {
         } catch (e) {
             console.log(e)
             setUpdateStatus("Update check failed")
+            TauriWebviewWindow.close().then()
         }
-    }, [])
+    }, [TauriWebviewWindow])
 
     const progress = isStart ? (downloaded * 100 / contentLength) : 0
     
