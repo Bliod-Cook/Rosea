@@ -41,7 +41,10 @@ export default function RandomSettingsPage() {
         }
 
         const configData = TOML.parse(
-            (await readTextFile(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData })).slice(1, -1).split(",").join("\n")
+            (await readTextFile(CONFIG_FILE, { baseDir: BaseDirectory.AppLocalData }))
+                .slice(1, -1)
+                .split(",")
+                .join("\n")
         );
         configData["random_min"] = String(Number(input1));
         configData["random_max"] = String(Number(input2));
