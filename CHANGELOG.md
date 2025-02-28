@@ -1,3 +1,9 @@
+## 0.3.2
+
+new update window
+
+---
+
 ## 0.3.1
 
 fix(menu): fix wrong window size
