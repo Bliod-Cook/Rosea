@@ -18,11 +18,10 @@ export default function Update() {
     }, []);
 
     useEffect(() => {
-        let downloaded_length = 0;
         try {
             check().then(async (update) => {
                 if (update) {
-                    setUpdateStatus("New version found, preparing download...")
+                    setUpdateStatus("Preparing download...")
                     await update.downloadAndInstall((event) => {
                         switch (event.event) {
                             case "Started":
@@ -34,8 +33,7 @@ export default function Update() {
                                 }
                                 break;
                             case "Progress":
-                                downloaded_length += event.data.chunkLength
-                                setDownloaded(downloaded_length)
+                                setDownloaded(prev => event.data.chunkLength + prev)
                                 break;
                             case "Finished":
                                 setUpdateStatus("Download complete, preparing to install...")
