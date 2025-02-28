@@ -17,15 +17,36 @@ export async function Update() {
     new TauriWebviewWindow("update", {
         url: "/update/",
         title: "更新",
-        width: 250,
-        height: 180,
-        transparent: false,
+        width: 600,
+        height: 330,
+        transparent: true,
         alwaysOnTop: false,
         decorations: false,
         shadow: false,
         resizable: false,
-        skipTaskbar: false,
+        skipTaskbar: true,
         visible: false,
+        maximizable: false
+    })
+}
+
+export async function ManualUpdate() {
+    const page = await TauriWebviewWindow.getByLabel("update")
+    if (page?.label) {
+        await page.close()
+    }
+    new TauriWebviewWindow("update", {
+        url: "/update/",
+        title: "更新",
+        width: 600,
+        height: 330,
+        transparent: true,
+        alwaysOnTop: false,
+        decorations: false,
+        shadow: false,
+        resizable: false,
+        skipTaskbar: true,
+        visible: true,
         maximizable: false
     })
 }

@@ -3,7 +3,7 @@ import {defaultWindowIcon} from "@tauri-apps/api/app";
 import {Menu} from "@tauri-apps/api/menu";
 import {invoke} from "@tauri-apps/api/core";
 import {emit, listen} from "@tauri-apps/api/event";
-import { Update } from "./update.ts";
+import { ManualUpdate } from "./update.ts";
 import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/plugin-notification";
 
 const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
@@ -37,7 +37,7 @@ async function changeTray()  {
             {
                 id: "check_update",
                 text: "Check for Updates",
-                action: () => {manual_update_check = true;Update().then()}
+                action: () => {manual_update_check = true;ManualUpdate().then()}
             },
             {
                 id: "Quit",
@@ -50,7 +50,7 @@ async function changeTray()  {
     await tray.setMenu(menu)
 }
 
-listen("newest-version", async () => {
+listen("notice://newest-version", async () => {
     if (manual_update_check) {
         let permission = await isPermissionGranted();
 
