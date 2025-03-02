@@ -45,10 +45,9 @@ export default function Update() {
                     })
                 } else {
                     setUpdateStatus("Already on the latest version")
-                    const timeout = setTimeout(() => {
+                    setTimeout(() => {
                         TauriWebviewWindow.close().then()
                     }, 1500)
-                    return () => {clearTimeout(timeout)}
                 }
             })
         } catch (e) {
