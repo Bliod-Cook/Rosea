@@ -1,20 +1,23 @@
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {currentMonitor, getCurrentWindow, PhysicalSize} from "@tauri-apps/api/window";
 import "./canvas.scss"
 import {moveWindow, Position} from "@tauri-apps/plugin-positioner";
 import Konva from "konva";
 
 export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
+    const TauriWebviewWindow = useMemo(() => {
+        return getCurrentWindow()
+    }, []);
+
     useEffect(() => {
-        const window = getCurrentWindow();
-        window.setIgnoreCursorEvents(true).then();
+        TauriWebviewWindow.setIgnoreCursorEvents(true).then();
         currentMonitor().then((monitor)=>{
             if (monitor) {
                 moveWindow(Position.TopLeft).then();
-                window.setSize(monitor.size).then(()=>{});
+                TauriWebviewWindow.setSize(monitor.size).then(()=>{});
             }
         })
-    });
+    }, []);
 
     useEffect(() => {
         let lineWidth = 3;
@@ -25,20 +28,18 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
         let isPaint = false;
         let lastLine: Konva.Line;
 
-        const window = getCurrentWindow();
-
-        window.listen("change://canvas/mode", (event) => {
-            window.setIgnoreCursorEvents(event.payload == 1).then()
+        TauriWebviewWindow.listen("change://canvas/mode", (event) => {
+            TauriWebviewWindow.setIgnoreCursorEvents(event.payload == 1).then()
             isErasing = event.payload == 3
         }).then()
 
-        window.listen("change://canvas/lineWidth", (e)=>{
+        TauriWebviewWindow.listen("change://canvas/lineWidth", (e)=>{
             lineWidth = e.payload as number
         }).then()
-        window.listen("change://canvas/penColor", (e)=> {
+        TauriWebviewWindow.listen("change://canvas/penColor", (e)=> {
             color = e.payload as string
         }).then()
-        window.listen("change://canvas/eraserSize", (e)=>{
+        TauriWebviewWindow.listen("change://canvas/eraserSize", (e)=>{
             eraserSize = e.payload as number
         }).then()
 
@@ -55,7 +56,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
         stage.add(layer)
 
-        window.listen("reset://canvas/draw", ()=>{
+        TauriWebviewWindow.listen("reset://canvas/draw", ()=>{
             layer.destroy()
             layer = new Konva.Layer
             stage.add(layer)
