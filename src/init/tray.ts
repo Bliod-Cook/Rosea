@@ -4,7 +4,6 @@ import {Menu} from "@tauri-apps/api/menu";
 import {invoke} from "@tauri-apps/api/core";
 import {emit, listen} from "@tauri-apps/api/event";
 import { ManualUpdate } from "./update.ts";
-import {isPermissionGranted, requestPermission, sendNotification} from "@tauri-apps/plugin-notification";
 
 const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
     showMenuOnLeftClick: true,
@@ -14,7 +13,6 @@ const tray = await TrayIcon.getById("default") ?? await TrayIcon.new({
 
 export let moveable = false;
 export let visibility = true;
-export let manual_update_check = false;
 export let canvas_mode = 1;
 
 export async function initTray() {
@@ -37,7 +35,7 @@ async function changeTray()  {
             {
                 id: "check_update",
                 text: "Check for Updates",
-                action: () => {manual_update_check = true;ManualUpdate().then()}
+                action: () => {ManualUpdate().then()}
             },
             {
                 id: "Quit",
@@ -49,25 +47,6 @@ async function changeTray()  {
 
     await tray.setMenu(menu)
 }
-
-listen("notice://newest-version", async () => {
-    if (manual_update_check) {
-        let permission = await isPermissionGranted();
-
-        if (!permission) {
-            const per = await requestPermission();
-            permission = per === 'granted';
-        }
-
-        if (permission) {
-            sendNotification({
-                title: "Update",
-                body: "Application is up-to-date"
-            })
-        }
-        manual_update_check = false
-    }
-}).then()
 
 listen("change://clock/move-ability", (event) => {
     moveable = event.payload as boolean

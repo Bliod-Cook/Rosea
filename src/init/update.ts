@@ -11,7 +11,7 @@ export async function initUpdate() {
 
 export async function Update() {
     const page = await TauriWebviewWindow.getByLabel("update")
-    if (page?.label) {
+    if (page) {
         await page.close()
     }
     new TauriWebviewWindow("update", {

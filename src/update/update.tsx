@@ -3,7 +3,6 @@ import {useEffect, useMemo, useState} from "react";
 import {check} from "@tauri-apps/plugin-updater";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {moveWindow, Position} from '@tauri-apps/plugin-positioner';
-import {emit} from "@tauri-apps/api/event";
 import {Box, LinearProgress, Typography, Paper, CircularProgress} from "@mui/material";
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 
@@ -47,7 +46,6 @@ export default function Update() {
                 } else {
                     setUpdateStatus("Already on the latest version")
                     const timeout = setTimeout(() => {
-                        emit("notice://newest-version").then()
                         TauriWebviewWindow.close().then()
                     }, 1500)
                     return () => {clearTimeout(timeout)}
