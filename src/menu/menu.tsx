@@ -45,7 +45,7 @@ export default function Menu() {
     useEffect(() => {
         const window = getCurrentWindow();
 
-        window.setPosition(new PhysicalPosition(100, 100)).then()
+        window.setPosition(new PhysicalPosition(100, 150)).then()
         window.show().then()
 
         window.listen("change://clock/move-ability", (event) => {
