@@ -1,3 +1,9 @@
+## 0.3.4
+
+add single instance
+
+---
+
 ## 0.3.3
 
 new update window
