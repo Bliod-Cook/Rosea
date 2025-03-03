@@ -40,7 +40,7 @@ importers:
         version: 2.5.1
       '@vitejs/plugin-legacy':
         specifier: ^6.0.2
-        version: 6.0.2(terser@5.39.0)(vite@6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0))
+        version: 6.0.2(terser@5.39.0)(vite@6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0))
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -80,7 +80,7 @@ importers:
         version: 1.1.6
       '@types/node':
         specifier: ^22.13.8
-        version: 22.13.8
+        version: 22.13.9
       '@types/react':
         specifier: ^19.0.10
         version: 19.0.10
@@ -89,7 +89,7 @@ importers:
         version: 19.0.4(@types/react@19.0.10)
       '@vitejs/plugin-react-swc':
         specifier: ^3.8.0
-        version: 3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0))
+        version: 3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0))
       eslint:
         specifier: ^9.21.0
         version: 9.21.0
@@ -113,7 +113,7 @@ importers:
         version: 8.25.0(eslint@9.21.0)(typescript@5.7.3)
       vite:
         specifier: ^6.2.0
-        version: 6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0)
+        version: 6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0)
 
 packages:
 
@@ -1476,8 +1476,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@22.13.8':
-    resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
+  '@types/node@22.13.9':
+    resolution: {integrity: sha512-acBjXdRJ3A6Pb3tqnw9HZmyR3Fiol3aGxRCK1x3d+6CDAMjl7I649wpSd+yNURCjbOUGu9tqtLKnTGxmK6CyGw==}
 
   '@types/parse-json@4.0.2':
     resolution: {integrity: sha512-dISoDXWWQwUquiKsyZ4Ng+HX2KsPL7LyHKHQwgGFEA3IaKac4Obd+h2a/a6waisAoepJlBcx9paWqjA8/HVjCw==}
@@ -4001,7 +4001,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@22.13.8':
+  '@types/node@22.13.9':
     dependencies:
       undici-types: 6.20.0
 
@@ -4101,7 +4101,7 @@ snapshots:
       '@typescript-eslint/types': 8.25.0
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-legacy@6.0.2(terser@5.39.0)(vite@6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0))':
+  '@vitejs/plugin-legacy@6.0.2(terser@5.39.0)(vite@6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0))':
     dependencies:
       '@babel/core': 7.26.9
       '@babel/preset-env': 7.26.9(@babel/core@7.26.9)
@@ -4112,14 +4112,14 @@ snapshots:
       regenerator-runtime: 0.14.1
       systemjs: 6.15.1
       terser: 5.39.0
-      vite: 6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0)
+      vite: 6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react-swc@3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0))':
+  '@vitejs/plugin-react-swc@3.8.0(@swc/helpers@0.5.15)(vite@6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0))':
     dependencies:
       '@swc/core': 1.11.5(@swc/helpers@0.5.15)
-      vite: 6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0)
+      vite: 6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0)
     transitivePeerDependencies:
       - '@swc/helpers'
 
@@ -4992,13 +4992,13 @@ snapshots:
 
   varint@6.0.0: {}
 
-  vite@6.2.0(@types/node@22.13.8)(sass-embedded@1.85.1)(terser@5.39.0):
+  vite@6.2.0(@types/node@22.13.9)(sass-embedded@1.85.1)(terser@5.39.0):
     dependencies:
       esbuild: 0.25.0
       postcss: 8.5.3
       rollup: 4.34.9
     optionalDependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       fsevents: 2.3.3
       sass-embedded: 1.85.1
       terser: 5.39.0
