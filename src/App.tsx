@@ -26,6 +26,7 @@ export default function App() {
 
         window.listen("change://clock/move-ability", (event) => {
             setMoveable(event.payload as boolean)
+            window.setIgnoreCursorEvents(!(event.payload as boolean)).then()
         }).then()
 
         window.listen("change://clock/visibility", (event) => {
