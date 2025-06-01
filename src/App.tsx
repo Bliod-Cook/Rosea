@@ -48,8 +48,11 @@ export default function App() {
                  onContextMenu={(e)=>{e.preventDefault()}}
             >
                 <Box
-                    marginX={"auto"}
-                    marginY={"auto"}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="100vh"
+                    width="100%"
                 >
                     <span>
                         {time}

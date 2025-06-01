@@ -20,3 +20,7 @@ body {
 .tauri-drag {
     app-region: drag;
 }
+
+#main-div span {
+    transform: translateY(-5%);
+}
