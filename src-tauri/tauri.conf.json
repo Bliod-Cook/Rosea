@@ -119,7 +119,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM0MTYzNzI3RTJENkMyNjkKUldScHd0YmlKemNXTkkwZFJHSHV1UThtWmRENTBwUW8yRWhCbzBBbDFYL2F1REoza1hqNHNaTjQK",
       "endpoints": [
-        "https://proxy.rosea.planten-dev.top",
+        "https://proxy.rosea.planten.dev",
         "https://github.com/Bliod-Cook/Rosea/releases/latest/download/latest.json"
       ]
     }
