@@ -1,3 +1,9 @@
+# 0.4.0
+
+update dependencies, change update check
+
+---
+
 ## 0.3.5
 
 1 fix
