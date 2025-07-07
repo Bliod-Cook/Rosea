@@ -1,3 +1,9 @@
+## 0.4.2
+
+optimize canvas
+
+---
+
 ## 0.4.1
 
 update dependencies, change update check
