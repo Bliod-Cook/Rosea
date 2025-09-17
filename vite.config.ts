@@ -57,10 +57,10 @@ export default defineConfig({
   },
   plugins: [
       react(),
-      legacy({
-        renderLegacyChunks: false,
-        modernTargets: ["edge>=109", "safari>=13"],
-        modernPolyfills: true,
-      }),
+      // legacy({
+      //   renderLegacyChunks: false,
+      //   modernTargets: ["edge>=109", "safari>=13"],
+      //   modernPolyfills: true,
+      // }),
   ]
 });
