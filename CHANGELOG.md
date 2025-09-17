@@ -1,3 +1,9 @@
+## 0.5.0
+
+fully rewrite pen
+
+---
+
 ## 0.4.2
 
 optimize canvas

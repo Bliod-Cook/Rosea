@@ -50,6 +50,8 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.imageSmoothingEnabled = true;
+    // @ts-ignore - older lib types may miss this
+    ctx.imageSmoothingQuality = "high";
     ctxRef.current = ctx;
   }, [screenSize.height, screenSize.width]);
 
@@ -94,13 +96,22 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     if (!ctx) return;
     const cfg = configRef.current;
 
+    const last = lastPointRef.current;
+    if (!last) return;
+
+    // Adjust width for pen on the fly
     if (cfg.mode === "pen") {
       ctx.lineWidth = currentStrokeWidth(pressure);
     }
 
-    // simple segment drawing; adequate for pen/eraser
-    ctx.lineTo(x, y);
+    // Smoothed quadratic segment from last point to midpoint
+    const midX = (last.x + x) / 2;
+    const midY = (last.y + y) / 2;
+    // Keep the path open; do not begin a new subpath each move,
+    // otherwise visual gaps may appear between segments.
+    ctx.quadraticCurveTo(last.x, last.y, midX, midY);
     ctx.stroke();
+    lastPointRef.current = {x, y};
   };
 
   const endStroke = () => {
@@ -132,9 +143,14 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = evt.clientX - rect.left;
-    const y = evt.clientY - rect.top;
-    continueStroke(x, y, evt.pressure);
+
+    const coalesced = (evt as any).getCoalescedEvents?.() as PointerEvent[] | undefined;
+    const events = coalesced && coalesced.length ? coalesced : [evt];
+    for (const e of events) {
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      continueStroke(x, y, (e as any).pressure);
+    }
   }, []);
 
   const handlePointerUp = useCallback((evt: PointerEvent) => {
@@ -179,6 +195,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     canvas.addEventListener("pointermove", move, {passive: false});
     canvas.addEventListener("pointerup", up, {passive: false});
     canvas.addEventListener("pointercancel", up);
+    canvas.addEventListener("lostpointercapture", up as any);
 
     // tauri event wiring
     const unlistenMode = TauriWebviewWindow.listen("change://canvas/mode", (event) => {
