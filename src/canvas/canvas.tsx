@@ -20,6 +20,13 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  // draw scheduling + buffering
+  const pointQueueRef = useRef<Array<{x: number; y: number; pressure?: number}>>([]);
+  const rafPendingRef = useRef(false);
+  const rafIdRef = useRef<number | null>(null);
+  const strokeWidthRef = useRef<number>(3);
+  const lastStrokeEndRef = useRef<{x: number; y: number} | null>(null);
+
   // runtime config stored in refs to avoid re-renders during drawing
   const configRef = useRef<DrawConfig>({
     mode: "pen",
@@ -80,7 +87,9 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     if (cfg.mode === "pen") {
       ctx.globalCompositeOperation = "source-over";
       ctx.strokeStyle = cfg.color;
-      ctx.lineWidth = currentStrokeWidth(pressure);
+      // lock width for the whole stroke to allow path batching
+      strokeWidthRef.current = currentStrokeWidth(pressure);
+      ctx.lineWidth = strokeWidthRef.current;
     } else if (cfg.mode === "eraser") {
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "rgba(0,0,0,1)";
@@ -88,30 +97,61 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     }
     ctx.beginPath();
     ctx.moveTo(x, y);
+    // clear any residual queued points from previous stroke
+    pointQueueRef.current.length = 0;
+    lastStrokeEndRef.current = {x, y};
   };
 
-  const continueStroke = (x: number, y: number, pressure?: number) => {
+  // Draw only the newly added segments and then reset the path
+  const flushQueuedSegments = () => {
     if (!isDrawingRef.current) return;
     const ctx = ctxRef.current;
-    if (!ctx) return;
     const cfg = configRef.current;
-
-    const last = lastPointRef.current;
+    const q = pointQueueRef.current;
+    if (!ctx || q.length === 0) return;
+    let last = lastPointRef.current;
     if (!last) return;
 
-    // Adjust width for pen on the fly
+    // keep a short local list to draw this frame
+    const local: Array<{x: number; y: number; pressure?: number}> = q.splice(0, q.length);
+
+    // For performance on low-end devices, we keep line width constant for the stroke.
     if (cfg.mode === "pen") {
-      ctx.lineWidth = currentStrokeWidth(pressure);
+      ctx.lineWidth = strokeWidthRef.current;
     }
 
-    // Smoothed quadratic segment from last point to midpoint
-    const midX = (last.x + x) / 2;
-    const midY = (last.y + y) / 2;
-    // Keep the path open; do not begin a new subpath each move,
-    // otherwise visual gaps may appear between segments.
-    ctx.quadraticCurveTo(last.x, last.y, midX, midY);
+    // Continue from the previous frame's end to avoid gaps
+    const start = lastStrokeEndRef.current || last;
+    if (!start) return;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+
+    let lastMidX = start.x;
+    let lastMidY = start.y;
+    for (const p of local) {
+      const midX = (last.x + p.x) / 2;
+      const midY = (last.y + p.y) / 2;
+      ctx.quadraticCurveTo(last.x, last.y, midX, midY);
+      lastMidX = midX;
+      lastMidY = midY;
+      last = p;
+    }
     ctx.stroke();
-    lastPointRef.current = {x, y};
+
+    // Remember where we ended this frame and latest point
+    lastStrokeEndRef.current = {x: lastMidX, y: lastMidY};
+    lastPointRef.current = last;
+  };
+
+  const scheduleDraw = () => {
+    if (rafPendingRef.current) return;
+    rafPendingRef.current = true;
+    rafIdRef.current = requestAnimationFrame(() => {
+      rafPendingRef.current = false;
+      flushQueuedSegments();
+      // If more points arrived during this frame, schedule again
+      if (pointQueueRef.current.length > 0) scheduleDraw();
+    });
   };
 
   const endStroke = () => {
@@ -121,6 +161,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     ctx.closePath();
     isDrawingRef.current = false;
     lastPointRef.current = null;
+    lastStrokeEndRef.current = null;
   };
 
   const handlePointerDown = useCallback((evt: PointerEvent) => {
@@ -149,15 +190,44 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     for (const e of events) {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      continueStroke(x, y, (e as any).pressure);
+      pointQueueRef.current.push({x, y, pressure: (e as any).pressure});
     }
+    scheduleDraw();
   }, []);
 
   const handlePointerUp = useCallback((evt: PointerEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.releasePointerCapture(evt.pointerId);
+    // Flush any pending segments before ending the stroke
+    flushQueuedSegments();
+    // Draw the final segment from last midpoint to final point to avoid a trailing gap
+    const ctx = ctxRef.current;
+    const cfg = configRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const endX = evt.clientX - rect.left;
+    const endY = evt.clientY - rect.top;
+    // Treat pointerup position as the final point
+    lastPointRef.current = {x: endX, y: endY};
+    const last = lastPointRef.current;
+    const start = lastStrokeEndRef.current || last;
+    if (ctx && last && start) {
+      if (cfg.mode === "pen") {
+        ctx.lineWidth = strokeWidthRef.current;
+      }
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(last.x, last.y);
+      ctx.stroke();
+      lastStrokeEndRef.current = {x: last.x, y: last.y};
+    }
     endStroke();
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+      rafPendingRef.current = false;
+    }
+    pointQueueRef.current.length = 0;
   }, []);
 
   const clearCanvas = useCallback(() => {
@@ -192,7 +262,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     const move = (e: PointerEvent) => handlePointerMove(e);
     const up = (e: PointerEvent) => handlePointerUp(e);
     canvas.addEventListener("pointerdown", down, {passive: false});
-    canvas.addEventListener("pointermove", move, {passive: false});
+    canvas.addEventListener("pointermove", move, {passive: true});
     canvas.addEventListener("pointerup", up, {passive: false});
     canvas.addEventListener("pointercancel", up);
     canvas.addEventListener("lostpointercapture", up as any);

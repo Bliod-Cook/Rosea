@@ -1,3 +1,9 @@
+## 0.5.1
+
+optimize pen performance
+
+---
+
 ## 0.5.0
 
 fully rewrite pen
