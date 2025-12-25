@@ -1,0 +1,1 @@
+2025-09-18: Implemented Windows NOACTIVATE overlay for Rosea to prevent Focus Assist/video pause. Added WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW via windows-sys and SetWindowPos with SWP_NOACTIVATE in src-tauri/src/lib.rs. Also set focus=false on overlay windows (canvas/menu/random/random/settings) in src-tauri/tauri.conf.json. Added logs for verification when applying styles.
