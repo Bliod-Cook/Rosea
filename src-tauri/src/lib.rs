@@ -4,9 +4,7 @@ use tauri::Manager;
 #[cfg(target_os = "windows")]
 mod win_noactivate {
     use tauri::WebviewWindow;
-    // Use windows-sys for API calls, but Tauri's `.hwnd()` returns a `windows` crate `HWND` newtype.
-    // Convert by taking the inner `.0` (isize) to `windows-sys`'s alias type.
-    use windows_sys::Win32::Foundation::HWND as HWND_SYS;
+    use windows_sys::Win32::Foundation::HWND;
     use windows_sys::Win32::UI::WindowsAndMessaging::{GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE, SWP_NOACTIVATE, SWP_SHOWWINDOW, SWP_NOOWNERZORDER, SWP_NOSENDCHANGING, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW};
 
     // Mark a window as non-activating and toolwindow to avoid stealing focus.
@@ -15,9 +13,8 @@ mod win_noactivate {
         unsafe {
             // `hwnd()` is available on Windows targets in Tauri 2 and returns isize.
             if let Ok(raw_hwnd) = window.hwnd() {
-                // `raw_hwnd` is `windows::Win32::Foundation::HWND` (newtype over isize).
-                let hwnd: HWND_SYS = raw_hwnd.0 as HWND_SYS;
-                log::info!("Applying WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW to '{}'", window.label());
+                let hwnd: HWND = raw_hwnd as HWND;
+
                 // Read existing extended styles and OR with desired flags.
                 let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
                 let new_ex_style = ex_style
@@ -35,7 +32,6 @@ mod win_noactivate {
                     0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING,
                 );
-                log::info!("WS_EX_* styles and NOACTIVATE SetWindowPos applied to '{}'", window.label());
             }
         }
     }
@@ -68,14 +64,8 @@ pub fn run() {
             #[cfg(target_os = "windows")]
             {
                 for label in ["canvas", "menu", "random", "random/settings"] {
-                    match app.get_webview_window(label) {
-                        Some(w) => {
-                            log::info!("Applying NOACTIVATE to window '{}'.", label);
-                            win_noactivate::apply(&w);
-                        }
-                        None => {
-                            log::info!("Window '{}' not found during setup; skipping.", label);
-                        }
+                    if let Some(w) = app.get_webview_window(label) {
+                        win_noactivate::apply(&w);
                     }
                 }
             }
