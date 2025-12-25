@@ -46,14 +46,14 @@ let isDrawing = false;
 let activePointer: number | null = null;
 let lastPoint: Point | null = null;
 let strokeWidthLocked = 3;
-let queue: Point[] = [];
+const queue: Point[] = [];
+let queueHead = 0;
 let lastFrameEnd: { x: number; y: number } | null = null;
 let dpr = 1;
 
 const FPS = 60;
 const FRAME_MS = Math.round(1000 / FPS);
-const MAX_SEGMENTS_PER_FRAME = 64;
-let intervalId: any = null;
+let timerId: number | null = null;
 
 function setupCtx() {
   if (!offscreen) return;
@@ -62,10 +62,12 @@ function setupCtx() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  (ctx as any).imageSmoothingEnabled = true;
+  ctx.imageSmoothingEnabled = true;
   try {
-    (ctx as any).imageSmoothingQuality = 'high';
-  } catch {}
+    ctx.imageSmoothingQuality = 'high';
+  } catch (err) {
+    void err;
+  }
 }
 
 function applySize(cssWidth: number, cssHeight: number, newDpr: number) {
@@ -102,10 +104,12 @@ function beginStroke(p: Point) {
   ctx.moveTo(p.x, p.y);
   lastFrameEnd = { x: p.x, y: p.y };
   queue.length = 0;
+  queueHead = 0;
 }
 
-function flush() {
+function flush(forceAll = false) {
   if (!isDrawing || !ctx || queue.length === 0 || !lastPoint) return;
+  if (queueHead >= queue.length) return;
   // Continue from the last frame end
   const start = lastFrameEnd || lastPoint;
   ctx.beginPath();
@@ -113,18 +117,23 @@ function flush() {
 
   if (cfg.mode === 'pen') ctx.lineWidth = strokeWidthLocked;
 
-  let processed = 0;
   let last = lastPoint;
   let endX = start.x;
   let endY = start.y;
 
-  while (queue.length && processed < MAX_SEGMENTS_PER_FRAME) {
-    const p = queue.shift()!;
+  const hardMax = forceAll ? Number.POSITIVE_INFINITY : (cfg.device === 'touch' ? 2048 : 256);
+  const budgetMs = forceAll ? Number.POSITIVE_INFINITY : (cfg.device === 'touch' ? 4 : 3);
+  const t0 = performance.now();
+
+  let processed = 0;
+  while (queueHead < queue.length && processed < hardMax) {
+    const p = queue[queueHead++]!;
     // Use lightweight lineTo for touch to reduce CPU cost
     if (cfg.device === 'touch') {
       ctx.lineTo(p.x, p.y);
       endX = p.x;
       endY = p.y;
+      last = p;
     } else {
       // Pen: keep curve smoothness
       const midX = (last.x + p.x) / 2;
@@ -135,28 +144,49 @@ function flush() {
       last = p;
     }
     processed++;
+    if (!forceAll && (processed & 15) === 0 && performance.now() - t0 > budgetMs) break;
   }
   ctx.stroke();
   lastFrameEnd = { x: endX, y: endY };
   lastPoint = last;
+
+  if (queueHead >= queue.length) {
+    queue.length = 0;
+    queueHead = 0;
+  } else if (queueHead > 2048) {
+    queue.splice(0, queueHead);
+    queueHead = 0;
+  }
 }
 
 function endStroke() {
   if (!ctx) return;
-  flush();
+  flush(true);
   ctx.closePath();
   isDrawing = false;
   lastPoint = null;
   lastFrameEnd = null;
   queue.length = 0;
+  queueHead = 0;
+  if (timerId) {
+    clearTimeout(timerId);
+    timerId = null;
+  }
 }
 
-function startLoop() {
-  if (intervalId) clearInterval(intervalId);
-  intervalId = setInterval(flush, FRAME_MS);
+function ensureLoop(delay = 0) {
+  if (timerId) return;
+  timerId = setTimeout(() => {
+    timerId = null;
+    const t0 = performance.now();
+    flush();
+    const elapsed = performance.now() - t0;
+    if (isDrawing && queueHead < queue.length) {
+      ensureLoop(Math.max(0, FRAME_MS - elapsed));
+    }
+  }, delay);
 }
 
-// eslint-disable-next-line no-restricted-globals
 self.onmessage = (ev: MessageEvent<Msg>) => {
   const m = ev.data;
   switch (m.type) {
@@ -167,7 +197,6 @@ self.onmessage = (ev: MessageEvent<Msg>) => {
       offscreen = m.canvas;
       cfg = { ...cfg, ...m.config };
       applySize(m.cssWidth, m.cssHeight, m.dpr);
-      startLoop();
       break;
     }
     case 'config': {
@@ -196,6 +225,7 @@ self.onmessage = (ev: MessageEvent<Msg>) => {
       if (m.id !== activePointer) break;
       // append to queue
       for (const p of m.points) queue.push(p);
+      ensureLoop();
       break;
     }
     case 'end': {
@@ -206,4 +236,3 @@ self.onmessage = (ev: MessageEvent<Msg>) => {
     }
   }
 };
-

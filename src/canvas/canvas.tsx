@@ -7,6 +7,10 @@ type Mode = "disabled" | "pen" | "eraser";
 
 type InputDevice = "mouse" | "touch" | "pen";
 
+type CoalescedPointerEvent = PointerEvent & {
+  getCoalescedEvents?: () => PointerEvent[];
+};
+
 type DrawConfig = {
   mode: Mode;
   lineWidth: number; // pen width in CSS pixels
@@ -19,9 +23,12 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
   const TauriWebviewWindow = useMemo(() => getCurrentWindow(), []);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const rectRef = useRef<DOMRect | null>(null);
 
   // draw scheduling + buffering
   const pointQueueRef = useRef<Array<{x: number; y: number; pressure?: number}>>([]);
+  const pointQueueHeadRef = useRef(0);
+  const lastQueuedPointRef = useRef<{x: number; y: number; pressure?: number} | null>(null);
   const rafPendingRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
   const strokeWidthRef = useRef<number>(3);
@@ -31,6 +38,9 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
   const inputWorkerRef = useRef<Worker | null>(null);
   const drawWorkerRef = useRef<Worker | null>(null);
   const useWorkersRef = useRef(false);
+  const workerMoveBufferRef = useRef<Map<number, Array<{x: number; y: number; pressure?: number}>>>(new Map());
+  const workerSendRafPendingRef = useRef(false);
+  const workerSendRafIdRef = useRef<number | null>(null);
 
   // runtime config stored in refs to avoid re-renders during drawing
   const configRef = useRef<DrawConfig>({
@@ -45,6 +55,14 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
   const lastPointRef = useRef<{x: number; y: number} | null>(null);
   const deviceRef = useRef<InputDevice>("mouse");
 
+  const updateRect = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const rect = canvas.getBoundingClientRect();
+    rectRef.current = rect;
+    return rect;
+  }, []);
+
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -58,12 +76,13 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     // If using OffscreenCanvas (worker mode), only notify worker and do not
     // touch the main-thread 2D context or backing store sizes here.
     if (useWorkersRef.current && drawWorkerRef.current) {
-      (drawWorkerRef.current as any).postMessage({
+      drawWorkerRef.current.postMessage({
         type: "resize",
         cssWidth: width,
         cssHeight: height,
         dpr,
       });
+      updateRect();
       return;
     }
 
@@ -76,10 +95,14 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.imageSmoothingEnabled = true;
-    // @ts-ignore - older lib types may miss this
-    ctx.imageSmoothingQuality = "high";
+    try {
+      ctx.imageSmoothingQuality = "high";
+    } catch (err) {
+      void err;
+    }
     ctxRef.current = ctx;
-  }, [screenSize.height, screenSize.width]);
+    updateRect();
+  }, [screenSize.height, screenSize.width, updateRect]);
 
   const detectDevice = (e: PointerEvent): InputDevice => {
     if (e.pointerType === "pen") return "pen";
@@ -118,21 +141,26 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     ctx.moveTo(x, y);
     // clear any residual queued points from previous stroke
     pointQueueRef.current.length = 0;
+    pointQueueHeadRef.current = 0;
+    lastQueuedPointRef.current = {x, y, pressure};
     lastStrokeEndRef.current = {x, y};
   };
 
   // Draw only the newly added segments and then reset the path
-  const flushQueuedSegments = () => {
+  const flushQueuedSegments = (forceAll = false) => {
     if (!isDrawingRef.current) return;
     const ctx = ctxRef.current;
     const cfg = configRef.current;
     const q = pointQueueRef.current;
     if (!ctx || q.length === 0) return;
+    let head = pointQueueHeadRef.current;
+    if (head >= q.length) {
+      q.length = 0;
+      pointQueueHeadRef.current = 0;
+      return;
+    }
     let last = lastPointRef.current;
     if (!last) return;
-
-    // keep a short local list to draw this frame
-    const local: Array<{x: number; y: number; pressure?: number}> = q.splice(0, q.length);
 
     // For performance on low-end devices, we keep line width constant for the stroke.
     if (cfg.mode === "pen") {
@@ -145,21 +173,51 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
 
-    let lastMidX = start.x;
-    let lastMidY = start.y;
-    for (const p of local) {
-      const midX = (last.x + p.x) / 2;
-      const midY = (last.y + p.y) / 2;
-      ctx.quadraticCurveTo(last.x, last.y, midX, midY);
-      lastMidX = midX;
-      lastMidY = midY;
-      last = p;
-    }
-    ctx.stroke();
+    const isTouch = deviceRef.current === "touch";
+    const maxSeg = forceAll ? Number.POSITIVE_INFINITY : (isTouch ? 256 : 64);
 
-    // Remember where we ended this frame and latest point
-    lastStrokeEndRef.current = {x: lastMidX, y: lastMidY};
-    lastPointRef.current = last;
+    let processed = 0;
+    if (isTouch) {
+      let endX = start.x;
+      let endY = start.y;
+      while (head < q.length && processed < maxSeg) {
+        const p = q[head++]!;
+        ctx.lineTo(p.x, p.y);
+        endX = p.x;
+        endY = p.y;
+        last = p;
+        processed++;
+      }
+      ctx.stroke();
+      lastStrokeEndRef.current = {x: endX, y: endY};
+      lastPointRef.current = last;
+    } else {
+      let lastMidX = start.x;
+      let lastMidY = start.y;
+      while (head < q.length && processed < maxSeg) {
+        const p = q[head++]!;
+        const midX = (last.x + p.x) / 2;
+        const midY = (last.y + p.y) / 2;
+        ctx.quadraticCurveTo(last.x, last.y, midX, midY);
+        lastMidX = midX;
+        lastMidY = midY;
+        last = p;
+        processed++;
+      }
+      ctx.stroke();
+      // Remember where we ended this frame and latest point
+      lastStrokeEndRef.current = {x: lastMidX, y: lastMidY};
+      lastPointRef.current = last;
+    }
+
+    pointQueueHeadRef.current = head;
+    if (head >= q.length) {
+      q.length = 0;
+      pointQueueHeadRef.current = 0;
+    } else if (head > 2048) {
+      q.splice(0, head);
+      pointQueueHeadRef.current = 0;
+    }
   };
 
   const scheduleDraw = () => {
@@ -181,6 +239,30 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     isDrawingRef.current = false;
     lastPointRef.current = null;
     lastStrokeEndRef.current = null;
+    lastQueuedPointRef.current = null;
+    pointQueueRef.current.length = 0;
+    pointQueueHeadRef.current = 0;
+  };
+
+  const flushWorkerMoveBuffer = useCallback(() => {
+    if (!useWorkersRef.current) return;
+    const inputWorker = inputWorkerRef.current;
+    if (!inputWorker) return;
+    for (const [id, points] of workerMoveBufferRef.current) {
+      if (points.length) {
+        inputWorker.postMessage({ type: "move", id, points });
+      }
+    }
+    workerMoveBufferRef.current.clear();
+  }, []);
+
+  const scheduleWorkerSend = () => {
+    if (workerSendRafPendingRef.current) return;
+    workerSendRafPendingRef.current = true;
+    workerSendRafIdRef.current = requestAnimationFrame(() => {
+      workerSendRafPendingRef.current = false;
+      flushWorkerMoveBuffer();
+    });
   };
 
   const handlePointerDown = useCallback((evt: PointerEvent) => {
@@ -188,7 +270,8 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     if (cfg.mode === "disabled") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
+    const rect = updateRect();
+    if (!rect) return;
     const x = evt.clientX - rect.left;
     const y = evt.clientY - rect.top;
     deviceRef.current = detectDevice(evt);
@@ -197,10 +280,11 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     canvas.setPointerCapture(evt.pointerId);
     if (useWorkersRef.current && inputWorkerRef.current) {
       isDrawingRef.current = true;
+      workerMoveBufferRef.current.delete(evt.pointerId);
       inputWorkerRef.current.postMessage({
         type: "down",
         id: evt.pointerId,
-        point: { x, y, pressure: (evt as any).pressure },
+        point: { x, y, pressure: evt.pressure },
       });
       // Update device to workers as hint for optimizations
       inputWorkerRef.current.postMessage({ type: "config", config: { device: deviceRef.current } });
@@ -214,23 +298,57 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     if (!isDrawingRef.current) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
+    const rect = rectRef.current ?? updateRect();
+    if (!rect) return;
 
-    const coalesced = (evt as any).getCoalescedEvents?.() as PointerEvent[] | undefined;
+    const coalesced = (evt as CoalescedPointerEvent).getCoalescedEvents?.();
     const events = coalesced && coalesced.length ? coalesced : [evt];
     if (useWorkersRef.current && inputWorkerRef.current) {
-      const pts = events.map((e) => ({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-        pressure: (e as any).pressure,
-      }));
-      inputWorkerRef.current.postMessage({ type: "move", id: evt.pointerId, points: pts });
+      const buf = workerMoveBufferRef.current;
+      const existing = buf.get(evt.pointerId);
+      if (existing) {
+        for (const e of events) {
+          existing.push({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            pressure: e.pressure,
+          });
+        }
+      } else {
+        const pts: Array<{x: number; y: number; pressure?: number}> = [];
+        for (const e of events) {
+          pts.push({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+            pressure: e.pressure,
+          });
+        }
+        buf.set(evt.pointerId, pts);
+      }
+      scheduleWorkerSend();
     } else {
+      const cfg = configRef.current;
+      const activeWidth = cfg.mode === "eraser" ? cfg.eraserSize : strokeWidthRef.current;
+      const minDist = Math.max(0.5, activeWidth * 0.4);
+      const minDist2 = minDist * minDist;
+      let lastQueued = lastQueuedPointRef.current;
       for (const e of events) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        pointQueueRef.current.push({x, y, pressure: (e as any).pressure});
+        const p = {x, y, pressure: e.pressure};
+        if (!lastQueued) {
+          pointQueueRef.current.push(p);
+          lastQueued = p;
+          continue;
+        }
+        const dx = p.x - lastQueued.x;
+        const dy = p.y - lastQueued.y;
+        if (dx * dx + dy * dy >= minDist2) {
+          pointQueueRef.current.push(p);
+          lastQueued = p;
+        }
       }
+      lastQueuedPointRef.current = lastQueued;
       scheduleDraw();
     }
   }, []);
@@ -240,22 +358,30 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     if (!canvas) return;
     canvas.releasePointerCapture(evt.pointerId);
     if (useWorkersRef.current && inputWorkerRef.current) {
-      const rect = canvas.getBoundingClientRect();
+      if (workerSendRafIdRef.current) {
+        cancelAnimationFrame(workerSendRafIdRef.current);
+        workerSendRafIdRef.current = null;
+        workerSendRafPendingRef.current = false;
+      }
+      flushWorkerMoveBuffer();
+      const rect = rectRef.current ?? updateRect();
+      if (!rect) return;
       const endX = evt.clientX - rect.left;
       const endY = evt.clientY - rect.top;
       inputWorkerRef.current.postMessage({
         type: "up",
         id: evt.pointerId,
-        point: { x: endX, y: endY, pressure: (evt as any).pressure },
+        point: { x: endX, y: endY, pressure: evt.pressure },
       });
       isDrawingRef.current = false;
     } else {
       // Flush any pending segments before ending the stroke
-      flushQueuedSegments();
+      flushQueuedSegments(true);
       // Draw the final segment from last midpoint to final point to avoid a trailing gap
       const ctx = ctxRef.current;
       const cfg = configRef.current;
-      const rect = canvas.getBoundingClientRect();
+      const rect = rectRef.current ?? updateRect();
+      if (!rect) return;
       const endX = evt.clientX - rect.left;
       const endY = evt.clientY - rect.top;
       // Treat pointerup position as the final point
@@ -279,6 +405,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
         rafPendingRef.current = false;
       }
       pointQueueRef.current.length = 0;
+      pointQueueHeadRef.current = 0;
     }
   }, []);
 
@@ -311,14 +438,16 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
     // Try Workers + OffscreenCanvas for rendering off the main thread
     try {
-      const supportsOffscreen = (canvas as any).transferControlToOffscreen !== undefined;
-      if (supportsOffscreen) {
+      const canTransferToOffscreen = (
+        c: HTMLCanvasElement,
+      ): c is HTMLCanvasElement & { transferControlToOffscreen: () => OffscreenCanvas } =>
+        typeof (c as { transferControlToOffscreen?: unknown }).transferControlToOffscreen === "function";
+
+      if (canTransferToOffscreen(canvas)) {
         const dpr = Math.max(1, window.devicePixelRatio || 1);
         // Transfer control of the canvas to an OffscreenCanvas
-        const offscreen = (canvas as any).transferControlToOffscreen();
-        // @ts-ignore - Vite module workers
+        const offscreen = canvas.transferControlToOffscreen();
         const drawWorker = new Worker(new URL('./workers/drawWorker.ts', import.meta.url), { type: 'module' });
-        // @ts-ignore - Vite module workers
         const inputWorker = new Worker(new URL('./workers/inputWorker.ts', import.meta.url), { type: 'module' });
         const channel = new MessageChannel();
         inputWorker.postMessage({ type: 'connect' }, [channel.port1]);
@@ -354,7 +483,7 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     canvas.addEventListener("pointermove", move, {passive: true});
     canvas.addEventListener("pointerup", up, {passive: false});
     canvas.addEventListener("pointercancel", up);
-    canvas.addEventListener("lostpointercapture", up as any);
+    canvas.addEventListener("lostpointercapture", up);
 
     // tauri event wiring
     const unlistenMode = TauriWebviewWindow.listen("change://canvas/mode", (event) => {
@@ -416,8 +545,14 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
       unlistenEraserSize.then((f) => f());
       unlistenReset.then((f) => f());
       // terminate workers
-      try { inputWorkerRef.current?.terminate(); } catch {}
-      try { drawWorkerRef.current?.terminate(); } catch {}
+      try { inputWorkerRef.current?.terminate(); } catch (err) { void err; }
+      try { drawWorkerRef.current?.terminate(); } catch (err) { void err; }
+      if (workerSendRafIdRef.current) {
+        cancelAnimationFrame(workerSendRafIdRef.current);
+        workerSendRafIdRef.current = null;
+        workerSendRafPendingRef.current = false;
+      }
+      workerMoveBufferRef.current.clear();
     };
   }, [TauriWebviewWindow, clearCanvas, handlePointerDown, handlePointerMove, handlePointerUp, resizeCanvas]);
 

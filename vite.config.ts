@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path'
 import * as path from "node:path";
 import react from "@vitejs/plugin-react-swc";
-import legacy from "@vitejs/plugin-legacy"
 
 const host = process.env.TAURI_DEV_HOST;
 

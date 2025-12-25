@@ -52,13 +52,11 @@ type Msg =
   | { type: 'move'; id: number; points: Point[] }
   | { type: 'up'; id: number; point: Point };
 
-// eslint-disable-next-line no-restricted-globals
 self.onmessage = (ev: MessageEvent<Msg>) => {
   const data = ev.data;
   if (data.type === 'connect') {
     // First transferable should be a MessagePort
-    const [port] = (ev as any).ports as MessagePort[];
-    drawPort = port;
+    drawPort = ev.ports[0] ?? null;
     return;
   }
   if (data.type === 'config') {
@@ -82,7 +80,6 @@ self.onmessage = (ev: MessageEvent<Msg>) => {
   }
 
   if (data.type === 'up') {
-    const st = pointerStates.get(data.id) ?? { isDrawing: false, lastPoint: null };
     pointerStates.delete(data.id);
     // Ensure final point is sent so draw can close the stroke
     drawPort.postMessage({ type: 'points', id: data.id, points: [data.point] });
@@ -90,4 +87,3 @@ self.onmessage = (ev: MessageEvent<Msg>) => {
     return;
   }
 };
-
