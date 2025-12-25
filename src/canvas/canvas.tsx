@@ -27,6 +27,11 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
   const strokeWidthRef = useRef<number>(3);
   const lastStrokeEndRef = useRef<{x: number; y: number} | null>(null);
 
+  // workers related
+  const inputWorkerRef = useRef<Worker | null>(null);
+  const drawWorkerRef = useRef<Worker | null>(null);
+  const useWorkersRef = useRef(false);
+
   // runtime config stored in refs to avoid re-renders during drawing
   const configRef = useRef<DrawConfig>({
     mode: "pen",
@@ -46,10 +51,24 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const width = screenSize.width;
     const height = screenSize.height;
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
+    // Always update CSS size for display
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+
+    // If using OffscreenCanvas (worker mode), only notify worker and do not
+    // touch the main-thread 2D context or backing store sizes here.
+    if (useWorkersRef.current && drawWorkerRef.current) {
+      (drawWorkerRef.current as any).postMessage({
+        type: "resize",
+        cssWidth: width,
+        cssHeight: height,
+        dpr,
+      });
+      return;
+    }
+
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
 
     const ctx = canvas.getContext("2d", {desynchronized: true});
     if (!ctx) return;
@@ -176,7 +195,19 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     // Prevent scrolling/zooming
     evt.preventDefault();
     canvas.setPointerCapture(evt.pointerId);
-    beginStroke(x, y, evt.pressure);
+    if (useWorkersRef.current && inputWorkerRef.current) {
+      isDrawingRef.current = true;
+      inputWorkerRef.current.postMessage({
+        type: "down",
+        id: evt.pointerId,
+        point: { x, y, pressure: (evt as any).pressure },
+      });
+      // Update device to workers as hint for optimizations
+      inputWorkerRef.current.postMessage({ type: "config", config: { device: deviceRef.current } });
+      drawWorkerRef.current?.postMessage({ type: "config", config: { device: deviceRef.current } });
+    } else {
+      beginStroke(x, y, evt.pressure);
+    }
   }, []);
 
   const handlePointerMove = useCallback((evt: PointerEvent) => {
@@ -187,47 +218,68 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
 
     const coalesced = (evt as any).getCoalescedEvents?.() as PointerEvent[] | undefined;
     const events = coalesced && coalesced.length ? coalesced : [evt];
-    for (const e of events) {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      pointQueueRef.current.push({x, y, pressure: (e as any).pressure});
+    if (useWorkersRef.current && inputWorkerRef.current) {
+      const pts = events.map((e) => ({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        pressure: (e as any).pressure,
+      }));
+      inputWorkerRef.current.postMessage({ type: "move", id: evt.pointerId, points: pts });
+    } else {
+      for (const e of events) {
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        pointQueueRef.current.push({x, y, pressure: (e as any).pressure});
+      }
+      scheduleDraw();
     }
-    scheduleDraw();
   }, []);
 
   const handlePointerUp = useCallback((evt: PointerEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     canvas.releasePointerCapture(evt.pointerId);
-    // Flush any pending segments before ending the stroke
-    flushQueuedSegments();
-    // Draw the final segment from last midpoint to final point to avoid a trailing gap
-    const ctx = ctxRef.current;
-    const cfg = configRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const endX = evt.clientX - rect.left;
-    const endY = evt.clientY - rect.top;
-    // Treat pointerup position as the final point
-    lastPointRef.current = {x: endX, y: endY};
-    const last = lastPointRef.current;
-    const start = lastStrokeEndRef.current || last;
-    if (ctx && last && start) {
-      if (cfg.mode === "pen") {
-        ctx.lineWidth = strokeWidthRef.current;
+    if (useWorkersRef.current && inputWorkerRef.current) {
+      const rect = canvas.getBoundingClientRect();
+      const endX = evt.clientX - rect.left;
+      const endY = evt.clientY - rect.top;
+      inputWorkerRef.current.postMessage({
+        type: "up",
+        id: evt.pointerId,
+        point: { x: endX, y: endY, pressure: (evt as any).pressure },
+      });
+      isDrawingRef.current = false;
+    } else {
+      // Flush any pending segments before ending the stroke
+      flushQueuedSegments();
+      // Draw the final segment from last midpoint to final point to avoid a trailing gap
+      const ctx = ctxRef.current;
+      const cfg = configRef.current;
+      const rect = canvas.getBoundingClientRect();
+      const endX = evt.clientX - rect.left;
+      const endY = evt.clientY - rect.top;
+      // Treat pointerup position as the final point
+      lastPointRef.current = {x: endX, y: endY};
+      const last = lastPointRef.current;
+      const start = lastStrokeEndRef.current || last;
+      if (ctx && last && start) {
+        if (cfg.mode === "pen") {
+          ctx.lineWidth = strokeWidthRef.current;
+        }
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.lineTo(last.x, last.y);
+        ctx.stroke();
+        lastStrokeEndRef.current = {x: last.x, y: last.y};
       }
-      ctx.beginPath();
-      ctx.moveTo(start.x, start.y);
-      ctx.lineTo(last.x, last.y);
-      ctx.stroke();
-      lastStrokeEndRef.current = {x: last.x, y: last.y};
+      endStroke();
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+        rafPendingRef.current = false;
+      }
+      pointQueueRef.current.length = 0;
     }
-    endStroke();
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-      rafPendingRef.current = false;
-    }
-    pointQueueRef.current.length = 0;
   }, []);
 
   const clearCanvas = useCallback(() => {
@@ -257,6 +309,43 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
     const canvas = canvasRef.current!;
     canvas.style.touchAction = "none";
 
+    // Try Workers + OffscreenCanvas for rendering off the main thread
+    try {
+      const supportsOffscreen = (canvas as any).transferControlToOffscreen !== undefined;
+      if (supportsOffscreen) {
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        // Transfer control of the canvas to an OffscreenCanvas
+        const offscreen = (canvas as any).transferControlToOffscreen();
+        // @ts-ignore - Vite module workers
+        const drawWorker = new Worker(new URL('./workers/drawWorker.ts', import.meta.url), { type: 'module' });
+        // @ts-ignore - Vite module workers
+        const inputWorker = new Worker(new URL('./workers/inputWorker.ts', import.meta.url), { type: 'module' });
+        const channel = new MessageChannel();
+        inputWorker.postMessage({ type: 'connect' }, [channel.port1]);
+        drawWorker.postMessage({ type: 'connect' }, [channel.port2]);
+        drawWorker.postMessage({
+          type: 'init',
+          canvas: offscreen,
+          cssWidth: screenSize.width,
+          cssHeight: screenSize.height,
+          dpr,
+          config: {
+            mode: configRef.current.mode,
+            lineWidth: configRef.current.lineWidth,
+            color: configRef.current.color,
+            eraserSize: configRef.current.eraserSize,
+            pressureEnabled: configRef.current.pressureEnabled,
+            device: deviceRef.current,
+          },
+        }, [offscreen]);
+        inputWorkerRef.current = inputWorker;
+        drawWorkerRef.current = drawWorker;
+        useWorkersRef.current = true;
+      }
+    } catch {
+      useWorkersRef.current = false;
+    }
+
     // pointer events
     const down = (e: PointerEvent) => handlePointerDown(e);
     const move = (e: PointerEvent) => handlePointerMove(e);
@@ -277,21 +366,40 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
       else if (mode === 2) m = "pen";
       else if (mode === 3) m = "eraser";
       configRef.current.mode = m;
+      if (useWorkersRef.current && drawWorkerRef.current) {
+        drawWorkerRef.current.postMessage({ type: 'config', config: { mode: m } });
+      }
     });
 
     const unlistenLineWidth = TauriWebviewWindow.listen("change://canvas/lineWidth", (e) => {
       configRef.current.lineWidth = (e.payload as number) ?? 3;
+      if (useWorkersRef.current) {
+        inputWorkerRef.current?.postMessage({ type: 'config', config: { lineWidth: configRef.current.lineWidth } });
+        drawWorkerRef.current?.postMessage({ type: 'config', config: { lineWidth: configRef.current.lineWidth } });
+      }
     });
 
     const unlistenPenColor = TauriWebviewWindow.listen("change://canvas/penColor", (e) => {
       configRef.current.color = (e.payload as string) ?? "#d32f2f";
+      if (useWorkersRef.current && drawWorkerRef.current) {
+        drawWorkerRef.current.postMessage({ type: 'config', config: { color: configRef.current.color } });
+      }
     });
 
     const unlistenEraserSize = TauriWebviewWindow.listen("change://canvas/eraserSize", (e) => {
       configRef.current.eraserSize = (e.payload as number) ?? 60;
+      if (useWorkersRef.current && drawWorkerRef.current) {
+        drawWorkerRef.current.postMessage({ type: 'config', config: { eraserSize: configRef.current.eraserSize } });
+      }
     });
 
-    const unlistenReset = TauriWebviewWindow.listen("reset://canvas/draw", clearCanvas);
+    const unlistenReset = TauriWebviewWindow.listen("reset://canvas/draw", () => {
+      if (useWorkersRef.current && drawWorkerRef.current) {
+        drawWorkerRef.current.postMessage({ type: 'clear' });
+      } else {
+        clearCanvas();
+      }
+    });
 
     const onResize = () => resizeCanvas();
     window.addEventListener("resize", onResize);
@@ -307,6 +415,9 @@ export default function Canvas({screenSize}: {screenSize: PhysicalSize}) {
       unlistenPenColor.then((f) => f());
       unlistenEraserSize.then((f) => f());
       unlistenReset.then((f) => f());
+      // terminate workers
+      try { inputWorkerRef.current?.terminate(); } catch {}
+      try { drawWorkerRef.current?.terminate(); } catch {}
     };
   }, [TauriWebviewWindow, clearCanvas, handlePointerDown, handlePointerMove, handlePointerUp, resizeCanvas]);
 
