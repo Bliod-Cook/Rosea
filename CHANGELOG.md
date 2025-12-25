@@ -1,3 +1,9 @@
+## 0.5.3
+
+optimize pen performance
+
+---
+
 ## 0.5.2
 
 optimize pen performance
